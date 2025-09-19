@@ -6,8 +6,8 @@
  *  Copyright The Mbed TLS Contributors
  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
-#ifndef CHACHA20_NEON_H
-#define CHACHA20_NEON_H
+#ifndef TF_PSA_CRYPTO_CHACHA20_NEON_H
+#define TF_PSA_CRYPTO_CHACHA20_NEON_H
 
 #include "tf_psa_crypto_common.h"
 
@@ -59,4 +59,4 @@
 #endif
 #endif
 
-#endif /* CHACHA20_NEON_H */
+#endif /* TF_PSA_CRYPTO_CHACHA20_NEON_H */
