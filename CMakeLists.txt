@@ -426,6 +426,9 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
                 ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/tests/include
                 tests/include
                 tests/include/test
+                # Add the build-tree include directory before the source-tree one
+                # so that generated headers in the build tree take precedence.
+                ${CMAKE_CURRENT_BINARY_DIR}/include
                 include
                 core
                 drivers/builtin/src)
