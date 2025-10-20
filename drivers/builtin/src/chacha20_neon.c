@@ -46,8 +46,8 @@ static inline uint32x4_t chacha20_neon_vrotlq_8_u32(uint32x4_t v)
 #if defined(MBEDTLS_ARCH_IS_ARM64)
     // This implementation is slightly faster, but only supported on 64-bit Arm
     // Table look-up which results in an 8-bit rotate-left within each 32-bit element
-    const uint8_t    tbl_rotl8[16] = { 3, 0, 1, 2, 7, 4, 5, 6, 11, 8, 9, 10, 15, 12, 13, 14 };
-    const uint8x16_t vrotl8_tbl = vld1q_u8(tbl_rotl8);
+    const uint8_t    idx_rotl8[16] = { 3, 0, 1, 2, 7, 4, 5, 6, 11, 8, 9, 10, 15, 12, 13, 14 };
+    const uint8x16_t vrotl8_tbl = vld1q_u8(idx_rotl8);
     result = vreinterpretq_u32_u8(vqtbl1q_u8(vreinterpretq_u8_u32(v), vrotl8_tbl));
 #else
     uint32x4_t a = vshlq_n_u32(v, 8);
