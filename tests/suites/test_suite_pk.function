@@ -2168,7 +2168,7 @@ exit:
 /* BEGIN_CASE */
 void pk_get_key_type_wrap_psa(int key_type_arg, int bits)
 {
-    psa_key_id_t key;
+    psa_key_id_t key = 0;
     psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
     psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
@@ -2252,7 +2252,7 @@ exit:
 /* BEGIN_CASE */
 void pk_get_key_type_copy_from_psa_keypair(int key_type_arg, int bits)
 {
-    psa_key_id_t key;
+    psa_key_id_t key = 0;
     psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
     psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
@@ -2292,8 +2292,8 @@ exit:
 /* BEGIN_CASE */
 void pk_get_key_type_copy_from_psa_public(int key_type_arg, int bits)
 {
-    psa_key_id_t keypair;
-    psa_key_id_t public_key;
+    psa_key_id_t keypair = 0;
+    psa_key_id_t public_key = 0;
     psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
     psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
@@ -2356,7 +2356,7 @@ exit:
 /* BEGIN_CASE */
 void pk_get_key_type_copy_public_from_psa(int key_type_arg, int bits)
 {
-    psa_key_id_t keypair;
+    psa_key_id_t keypair = 0;
     psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
     psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
