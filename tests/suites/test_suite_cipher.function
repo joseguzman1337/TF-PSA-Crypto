@@ -1413,15 +1413,7 @@ void test_vec_crypt_cf(int cipher_id, int pad_mode, int operation, data_t *key,
     TEST_CF_SECRET(input->x, input->len);
 
     /* Prepare context */
-#if !defined(MBEDTLS_USE_PSA_CRYPTO) || !defined(MBEDTLS_TEST_DEPRECATED)
     (void) use_psa;
-#else
-    if (use_psa == 1) {
-        PSA_ASSERT(psa_crypto_init());
-        TEST_ASSERT(0 == mbedtls_cipher_setup_psa(&ctx,
-                                                  mbedtls_cipher_info_from_type(cipher_id), 0));
-    } else
-#endif /* !MBEDTLS_USE_PSA_CRYPTO || !MBEDTLS_TEST_DEPRECATED*/
     TEST_ASSERT(0 == mbedtls_cipher_setup(&ctx,
                                           mbedtls_cipher_info_from_type(cipher_id)));
 
