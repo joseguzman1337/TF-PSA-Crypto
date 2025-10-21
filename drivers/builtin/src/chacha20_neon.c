@@ -126,8 +126,8 @@ static inline void chacha20_neon_finish_block(chacha20_neon_regs_t r,
     vst1q_u8(o + 32, veorq_u8(vld1q_u8(i + 32), vreinterpretq_u8_u32(r.c)));
     vst1q_u8(o + 48, veorq_u8(vld1q_u8(i + 48), vreinterpretq_u8_u32(r.d)));
 
-    *input  = i + CHACHA20_BLOCK_SIZE_BYTES;
-    *output = o + CHACHA20_BLOCK_SIZE_BYTES;
+    *input  = i + MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES;
+    *output = o + MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES;
 }
 
 // Prevent gcc from rolling up the (manually unrolled) interleaved block loops
@@ -218,7 +218,7 @@ int mbedtls_chacha20_update(mbedtls_chacha20_context *ctx,
     size_t offset = 0U;
 
     /* Use leftover keystream bytes, if available */
-    while (ctx->keystream_bytes_used < CHACHA20_BLOCK_SIZE_BYTES && size > 0) {
+    while (ctx->keystream_bytes_used < MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES && size > 0) {
         output[offset] = input[offset]
                          ^ ctx->keystream8[ctx->keystream_bytes_used];
 
@@ -235,18 +235,18 @@ int mbedtls_chacha20_update(mbedtls_chacha20_context *ctx,
     state.d = vld1q_u32(&ctx->state[12]);
 
     /* Process full blocks */
-    if (size >= CHACHA20_BLOCK_SIZE_BYTES) {
-        size_t blocks = size / CHACHA20_BLOCK_SIZE_BYTES;
+    if (size >= MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES) {
+        size_t blocks = size / MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES;
         state.d = chacha20_neon_blocks(state, output + offset, input + offset, blocks);
 
-        offset += CHACHA20_BLOCK_SIZE_BYTES * blocks;
-        size   -= CHACHA20_BLOCK_SIZE_BYTES * blocks;
+        offset += MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES * blocks;
+        size   -= MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES * blocks;
     }
 
     /* Last (partial) block */
     if (size > 0U) {
         /* Generate new keystream block and increment counter */
-        memset(ctx->keystream8, 0, CHACHA20_BLOCK_SIZE_BYTES);
+        memset(ctx->keystream8, 0, MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES);
         state.d = chacha20_neon_blocks(state, ctx->keystream8, ctx->keystream8, 1);
 
         mbedtls_xor_no_simd(output + offset, input + offset, ctx->keystream8, size);

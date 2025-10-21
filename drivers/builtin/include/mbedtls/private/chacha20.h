@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define CHACHA20_BLOCK_SIZE_BYTES (4U * 16U)
+#define MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES (4U * 16U)
 
 /** Invalid input parameter(s). */
 #define MBEDTLS_ERR_CHACHA20_BAD_INPUT_DATA         PSA_ERROR_INVALID_ARGUMENT

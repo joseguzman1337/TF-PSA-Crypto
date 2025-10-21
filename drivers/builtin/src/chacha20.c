@@ -108,7 +108,7 @@ static void chacha20_block(const uint32_t initial_state[16],
 
     memcpy(working_state,
            initial_state,
-           CHACHA20_BLOCK_SIZE_BYTES);
+           MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES);
 
     for (i = 0U; i < 10U; i++) {
         chacha20_inner_block(working_state);
@@ -147,7 +147,7 @@ void mbedtls_chacha20_init(mbedtls_chacha20_context *ctx)
     mbedtls_platform_zeroize(ctx, sizeof(mbedtls_chacha20_context));
 
     /* Initially, there's no keystream bytes available */
-    ctx->keystream_bytes_used = CHACHA20_BLOCK_SIZE_BYTES;
+    ctx->keystream_bytes_used = MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES;
 }
 
 void mbedtls_chacha20_free(mbedtls_chacha20_context *ctx)
@@ -208,7 +208,7 @@ int mbedtls_chacha20_starts(mbedtls_chacha20_context *ctx,
     mbedtls_platform_zeroize(ctx->keystream8, sizeof(ctx->keystream8));
 
     /* Initially, there's no keystream bytes available */
-    ctx->keystream_bytes_used = CHACHA20_BLOCK_SIZE_BYTES;
+    ctx->keystream_bytes_used = MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES;
 
     return 0;
 }
@@ -223,7 +223,7 @@ int mbedtls_chacha20_update(mbedtls_chacha20_context *ctx,
     size_t offset = 0U;
 
     /* Use leftover keystream bytes, if available */
-    while (ctx->keystream_bytes_used < CHACHA20_BLOCK_SIZE_BYTES && size > 0) {
+    while (ctx->keystream_bytes_used < MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES && size > 0) {
         output[offset] = input[offset]
                          ^ ctx->keystream8[ctx->keystream_bytes_used];
 
@@ -233,15 +233,15 @@ int mbedtls_chacha20_update(mbedtls_chacha20_context *ctx,
     }
 
     /* Process full blocks */
-    while (size >= CHACHA20_BLOCK_SIZE_BYTES) {
+    while (size >= MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES) {
         /* Generate new keystream block and increment counter */
         chacha20_block(ctx->state, ctx->keystream8);
         ctx->state[CHACHA20_CTR_INDEX]++;
 
         mbedtls_xor(output + offset, input + offset, ctx->keystream8, 64U);
 
-        offset += CHACHA20_BLOCK_SIZE_BYTES;
-        size   -= CHACHA20_BLOCK_SIZE_BYTES;
+        offset += MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES;
+        size   -= MBEDTLS_CHACHA20_BLOCK_SIZE_BYTES;
     }
 
     /* Last (partial) block */
