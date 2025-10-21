@@ -75,10 +75,6 @@ extern "C" {
  * \brief   The RSA context structure.
  */
 typedef struct mbedtls_rsa_context {
-    int MBEDTLS_PRIVATE(ver);                    /*!<  Reserved for internal purposes.
-                                                  *    Do not set this field in application
-                                                  *    code. Its meaning might change without
-                                                  *    notice. */
     size_t MBEDTLS_PRIVATE(len);                 /*!<  The size of \p N in Bytes. */
 
     mbedtls_mpi MBEDTLS_PRIVATE(N);              /*!<  The public modulus. */
