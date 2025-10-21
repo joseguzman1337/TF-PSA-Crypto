@@ -317,6 +317,7 @@ depends_on:PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
 pk_can_do_ext:0:MBEDTLS_PK_RSA:0:0:0:1024:PSA_ALG_RSA_PSS(PSA_ALG_SHA_256):PSA_KEY_USAGE_SIGN_HASH:1
 
 PK can do PSA: basic input parameters checks
+depends_on:MBEDTLS_TEST_PSA_ECC_AT_LEAST_ONE_CURVE
 pk_can_do_psa_basic_checks:
 
 RSA verify test vector: PKCS1v1.5 (explicit), SHA1, good
