@@ -279,6 +279,7 @@ DEPENDS_ON = {
     'PSA_ALG_RSA_PSS': ['PSA_WANT_ALG_RSA_PSS'],
     'PSA_ALG_RSA_PKCS1V15_CRYPT': ['PSA_WANT_ALG_RSA_PKCS1V15_CRYPT'],
     'PSA_ALG_RSA_OAEP': ['PSA_WANT_ALG_RSA_OAEP'],
+    'MBEDTLS_TEST_PSA_ECC_ONE_FAMILY': ['MBEDTLS_TEST_PSA_ECC_AT_LEAST_ONE_CURVE'],
 }
 
 TEST_ALG = [
@@ -427,7 +428,7 @@ def generate_test_case(test_number, pk_type, key_type_bits, alg, alg2, usage, te
     new_content = []
     new_content.append(f"PK can do PSA #{test_number}: {pk_type} + {alg}/{alg2} + {usage} " \
                        f"-> {test_alg} + {test_usage}\n")
-    depends_on = populate_depends_on(pk_type=pk_type, alg=alg, alg2=alg2)
+    depends_on = populate_depends_on(pk_type=pk_type, key_type_bits=key_type_bits, alg=alg, alg2=alg2)
     new_content.append("depends_on:" + ":".join(depends_on) + "\n")
     expected_result = get_expected_result(pk_type, key_type_bits, alg,
                                           alg2, usage, test_usage, test_alg)
