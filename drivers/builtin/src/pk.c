@@ -921,6 +921,8 @@ static int copy_from_psa(mbedtls_svc_key_id_t key_id,
     }
     key_bits = psa_get_key_bits(&key_attr);
 
+    pk->psa_type = key_type;
+
 #if defined(PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY)
     if ((key_type == PSA_KEY_TYPE_RSA_KEY_PAIR) ||
         (key_type == PSA_KEY_TYPE_RSA_PUBLIC_KEY)) {
