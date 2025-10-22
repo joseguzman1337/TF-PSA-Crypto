@@ -1399,7 +1399,7 @@ exit:
  */
 void test_vec_crypt_cf(int cipher_id, int pad_mode, int operation, data_t *key,
                        data_t *iv, data_t *input, data_t *result,
-                       int expected_finish_result, int use_psa)
+                       int expected_finish_result)
 {
     mbedtls_cipher_context_t ctx;
     unsigned char output[32];
@@ -1413,7 +1413,6 @@ void test_vec_crypt_cf(int cipher_id, int pad_mode, int operation, data_t *key,
     TEST_CF_SECRET(input->x, input->len);
 
     /* Prepare context */
-    (void) use_psa;
     TEST_ASSERT(0 == mbedtls_cipher_setup(&ctx,
                                           mbedtls_cipher_info_from_type(cipher_id)));
 
