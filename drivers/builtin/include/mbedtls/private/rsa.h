@@ -22,10 +22,6 @@
 #include "mbedtls/private/bignum.h"
 #include "mbedtls/md.h"
 
-#if defined(MBEDTLS_THREADING_C)
-#include "mbedtls/threading.h"
-#endif
-
 /*
  * RSA Error codes
  */
@@ -79,10 +75,6 @@ extern "C" {
  * \brief   The RSA context structure.
  */
 typedef struct mbedtls_rsa_context {
-    int MBEDTLS_PRIVATE(ver);                    /*!<  Reserved for internal purposes.
-                                                  *    Do not set this field in application
-                                                  *    code. Its meaning might change without
-                                                  *    notice. */
     size_t MBEDTLS_PRIVATE(len);                 /*!<  The size of \p N in Bytes. */
 
     mbedtls_mpi MBEDTLS_PRIVATE(N);              /*!<  The public modulus. */
@@ -111,10 +103,6 @@ typedef struct mbedtls_rsa_context {
                                                     as specified in md.h for use in the MGF
                                                     mask generating function used in the
                                                     EME-OAEP and EMSA-PSS encodings. */
-#if defined(MBEDTLS_THREADING_C)
-    /* Invariant: the mutex is initialized iff ver != 0. */
-    mbedtls_threading_mutex_t MBEDTLS_PRIVATE(mutex);    /*!<  Thread-safety mutex. */
-#endif
 }
 mbedtls_rsa_context;
 
