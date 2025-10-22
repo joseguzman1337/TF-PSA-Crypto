@@ -175,6 +175,7 @@ int mbedtls_pk_wrap_psa(mbedtls_pk_context *ctx,
 
     ctx->pk_info = info;
     ctx->priv_id = key;
+    ctx->psa_type = type;
 
     return 0;
 }
