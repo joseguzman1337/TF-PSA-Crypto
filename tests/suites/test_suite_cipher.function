@@ -1128,7 +1128,7 @@ exit:
 /* BEGIN_CASE depends_on:MBEDTLS_CIPHER_MODE_AEAD */
 void auth_crypt_tv(int cipher_id, data_t *key, data_t *iv,
                    data_t *ad, data_t *cipher, data_t *tag,
-                   char *result, data_t *clear, int use_psa)
+                   char *result, data_t *clear)
 {
     /*
      * Take an AEAD ciphertext + tag and perform a pair
@@ -1164,11 +1164,6 @@ void auth_crypt_tv(int cipher_id, data_t *key, data_t *iv,
     }
 
     mbedtls_cipher_init(&ctx);
-
-    /* Initialize PSA Crypto */
-    if (use_psa == 1) {
-        PSA_ASSERT(psa_crypto_init());
-    }
 
     /*
      * Are we using NIST_KW? with padding?
@@ -1308,9 +1303,6 @@ exit:
     mbedtls_free(encrypt_buf);
     mbedtls_free(cipher_plus_tag);
 
-    if (use_psa == 1) {
-        PSA_DONE();
-    }
 }
 /* END_CASE */
 
