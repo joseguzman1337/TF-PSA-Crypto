@@ -1,13 +1,23 @@
 #!/usr/bin/env python3
 """
 Script to check/fix header guards in C header files.
-Converts guards to the format
-    TF_PSA_CRYPTO_<rel_path>_<filename>_H
-where:
-- 'TF_PSA_CRYPTO_' is the common hardcoded prefix;
-- 'rel_path' is the path used in C files to include such header file.
 
-Usage: python3 fix_header_guards.py
+Usage: scripts/c_header_guards.py [--fix]
+
+The script must be called from the TF-PSA-Crypto root folder.
+
+If called without any additional parameter the script checks current guards
+and in case of any mismatching with respect to the expected format it print
+the errors that it found and it returns an error code.
+If called with '--fix' input parameter, instead, it checks and modifies headers'
+guards if needed.
+
+The expected format for the headers' guards is as follows:
+    1. "<rel_path>_<filename>_H" for public headers;
+    2. "TF_PSA_CRYPTO_<rel_path>_<filename>_H" for private ones;
+where:
+- 'TF_PSA_CRYPTO_' is an hardcoded prefix;
+- 'rel_path' is the path used in C files to include such header file.
 """
 
 import sys
@@ -59,7 +69,7 @@ def generate_guard_name(file_path: str, trim_path: str) -> str:
 
 def find_line(lines: List[str], search_range, regex: str) -> Tuple[int, Match]:
     """Try to match the regex expression on the range of lines given in input.
-    The first successful match is returned; an execption is returned if no
+    The first successful match is returned; an exception is returned if no
     match is found in all the given lines.
 
     Input params:
