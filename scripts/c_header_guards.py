@@ -94,11 +94,9 @@ def process_header(file_path, trim_path, fix) -> None:
     On failure an exception is thrown.
     """
     with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+        lines = f.readlines()
 
     correct_guard = generate_guard_name(file_path, trim_path)
-
-    lines = content.split('\n')
 
     ifndef_line, match = find_line(lines, range(0, len(lines)),
                                    r'#ifndef\s+(\w+)\b')
@@ -134,7 +132,7 @@ def process_header(file_path, trim_path, fix) -> None:
                              f'    Found:{match.group(0)}')
 
     # Write back to file
-    new_content = '\n'.join(lines)
+    new_content = ''.join(lines)
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(new_content)
 
