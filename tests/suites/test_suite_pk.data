@@ -1519,6 +1519,18 @@ PK get type from parsed key, BrainpoolP256r1
 depends_on:PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_BASIC:PSA_WANT_ECC_BRAINPOOL_P_R1_256
 pk_get_key_type_parse_key:"../framework/data_files/ec_bp256_prv.pem":PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_BRAINPOOL_P_R1)
 
+PK get type from parsed key, SECP256r1, pkcs8 unencrypted
+depends_on:PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_BASIC:PSA_WANT_ECC_SECP_R1_256
+pk_get_key_type_parse_key:"../framework/data_files/ec_prv.pk8param.der":PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1)
+
+PK get type from parsed key, RSA, DER
+depends_on:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_BASIC
+pk_get_key_type_parse_key:"../framework/data_files/server1.key.der":PSA_KEY_TYPE_RSA_KEY_PAIR
+
+PK get type from parsed key, SECP521r1, DER
+depends_on:PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_BASIC:PSA_WANT_ECC_SECP_R1_521
+pk_get_key_type_parse_key:"../framework/data_files/ec_521_prv.der":PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1)
+
 PK get type from parsed public key, RSA
 depends_on:PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
 pk_get_key_type_parse_public_key:"../framework/data_files/server1.pubkey":PSA_KEY_TYPE_RSA_PUBLIC_KEY
