@@ -163,6 +163,8 @@ int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, 
         return MBEDTLS_ERR_PK_INVALID_PUBKEY;
     }
 
+    pk->psa_type = PSA_KEY_TYPE_ECC_PUBLIC_KEY(pk->ec_family);
+
     return 0;
 }
 

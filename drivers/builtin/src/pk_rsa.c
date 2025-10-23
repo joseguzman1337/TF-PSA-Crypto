@@ -98,6 +98,8 @@ int mbedtls_pk_rsa_set_pubkey(mbedtls_pk_context *pk, const unsigned char *key, 
     memcpy(pk->pub_raw, key, key_len);
     pk->pub_raw_len = key_len;
 
+    pk->psa_type = PSA_KEY_TYPE_RSA_PUBLIC_KEY;
+
     return 0;
 }
 
