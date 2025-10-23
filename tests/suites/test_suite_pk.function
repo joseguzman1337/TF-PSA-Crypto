@@ -2205,7 +2205,7 @@ exit:
 }
 /* END_CASE */
 
-/* BEGIN_CASE depends_on:MBEDTLS_FS_IO */
+/* BEGIN_CASE depends_on:MBEDTLS_FS_IO:MBEDTLS_PK_PARSE_C */
 void pk_get_key_type_parse_key(char *key_file, int key_type_arg)
 {
     psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
@@ -2227,7 +2227,7 @@ exit:
 }
 /* END_CASE */
 
-/* BEGIN_CASE depends_on:MBEDTLS_FS_IO */
+/* BEGIN_CASE depends_on:MBEDTLS_FS_IO:MBEDTLS_PK_PARSE_C */
 void pk_get_key_type_parse_public_key(char *key_file, int key_type_arg)
 {
     psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
