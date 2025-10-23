@@ -36,6 +36,7 @@ FOLDERS_TO_CHECK = {
     'include/mbedtls/': 'include/',
     'include/psa/': 'include/',
     'include/tf-psa-crypto/': 'include/',
+    'core/': 'core/',
 }
 
 def generate_guard_name(file_path: str, trim_path: str) -> str:
@@ -51,7 +52,7 @@ def generate_guard_name(file_path: str, trim_path: str) -> str:
     adjusted_name = re.sub(r'[^a-zA-Z0-9]', '_', adjusted_name).upper()
     guard_elements = []
     # Add prefix only to non public header files
-    if file_path.startswith('drivers'):
+    if not file_path.startswith('include'):
         guard_elements.append('TF_PSA_CRYPTO')
     guard_elements.extend([adjusted_name, 'H'])
     return '_'.join(guard_elements)
