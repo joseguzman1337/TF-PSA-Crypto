@@ -2349,6 +2349,7 @@ exit:
     psa_destroy_key(keypair);
     psa_destroy_key(public_key);
     mbedtls_pk_free(&ctx);
+    mbedtls_free(exported);
     PSA_DONE();
 }
 /* END_CASE */
