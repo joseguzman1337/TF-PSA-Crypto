@@ -31,16 +31,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 
     ret = mbedtls_pk_parse_key(&pk, Data, Size, NULL, 0);
     if (ret == 0) {
-        if (mbedtls_pk_get_type(&pk) == MBEDTLS_PK_RSA ||
-            mbedtls_pk_get_type(&pk) == MBEDTLS_PK_ECKEY ||
-            mbedtls_pk_get_type(&pk) == MBEDTLS_PK_ECKEY_DH) {
-            ret = mbedtls_pk_write_key_der(&pk, out_buf, Size);
-            if (ret != 0) {
-                abort();
-            }
-        } else {
-            /* The key is valid but is not of a supported type.
-             * This should not happen. */
+        ret = mbedtls_pk_write_key_der(&pk, out_buf, Size);
+        if (ret != 0) {
             abort();
         }
     }

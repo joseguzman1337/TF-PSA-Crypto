@@ -23,14 +23,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
     }
     ret = mbedtls_pk_parse_public_key(&pk, Data, Size);
     if (ret == 0) {
-        if (mbedtls_pk_get_type(&pk) == MBEDTLS_PK_RSA ||
-            mbedtls_pk_get_type(&pk) == MBEDTLS_PK_ECKEY ||
-            mbedtls_pk_get_type(&pk) == MBEDTLS_PK_ECKEY_DH) {
-            ret = mbedtls_pk_write_pubkey_der(&pk, out_buf, Size);
-            if (ret <= 0) {
-                abort();
-            }
-        } else {
+        ret = mbedtls_pk_write_pubkey_der(&pk, out_buf, Size);
+        if (ret <= 0) {
             abort();
         }
     }
