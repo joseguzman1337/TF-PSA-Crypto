@@ -6,8 +6,8 @@
  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
-#ifndef PSA_CRYPTO_SLOT_MANAGEMENT_H
-#define PSA_CRYPTO_SLOT_MANAGEMENT_H
+#ifndef TF_PSA_CRYPTO_PSA_CRYPTO_SLOT_MANAGEMENT_H
+#define TF_PSA_CRYPTO_PSA_CRYPTO_SLOT_MANAGEMENT_H
 
 #include "psa/crypto.h"
 #include "psa_crypto_core.h"
@@ -323,4 +323,4 @@ psa_status_t psa_validate_key_persistence(psa_key_lifetime_t lifetime);
  */
 int psa_is_valid_key_id(mbedtls_svc_key_id_t key, int vendor_ok);
 
-#endif /* PSA_CRYPTO_SLOT_MANAGEMENT_H */
+#endif /* TF_PSA_CRYPTO_PSA_CRYPTO_SLOT_MANAGEMENT_H */
