@@ -150,7 +150,7 @@ def main():
 
     had_failure = False
     for folder in FOLDERS_TO_CHECK:
-        files = [filename for filename in os.listdir(folder) if re.match(r'.*\.h', filename)]
+        files = [filename for filename in os.listdir(folder) if re.match(r'.*\.h$', filename)]
         for file in files:
             full_file_path = os.path.join(folder, file)
             try:
