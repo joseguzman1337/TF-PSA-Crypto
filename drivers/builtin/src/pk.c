@@ -49,6 +49,7 @@ void mbedtls_pk_init(mbedtls_pk_context *ctx)
      */
     ctx->pk_info = NULL;
     ctx->priv_id = MBEDTLS_SVC_KEY_ID_INIT;
+    ctx->psa_type = PSA_KEY_TYPE_NONE;
     memset(ctx->pub_raw, 0, sizeof(ctx->pub_raw));
     ctx->pub_raw_len = 0;
     ctx->bits = 0;
