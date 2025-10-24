@@ -64,7 +64,6 @@ endif()
 
 # Set the project, Mbed TLS and framework root directory.
 set(TF_PSA_CRYPTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(MBEDTLS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set(TF_PSA_CRYPTO_FRAMEWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/framework)
 
 # Put the version numbers into relevant files
