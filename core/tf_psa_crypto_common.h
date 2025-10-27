@@ -8,8 +8,8 @@
  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
-#ifndef MBEDTLS_LIBRARY_COMMON_H
-#define MBEDTLS_LIBRARY_COMMON_H
+#ifndef TF_PSA_CRYPTO_TF_PSA_CRYPTO_COMMON_H
+#define TF_PSA_CRYPTO_TF_PSA_CRYPTO_COMMON_H
 
 #include "tf-psa-crypto/build_info.h"
 #include "alignment.h"
@@ -485,4 +485,4 @@ static inline void mbedtls_xor_no_simd(unsigned char *r,
 #define MBEDTLS_ATTRIBUTE_UNTERMINATED_STRING
 #endif /* MBEDTLS_HAS_ATTRIBUTE_NONSTRING */
 
-#endif /* MBEDTLS_LIBRARY_COMMON_H */
+#endif /* TF_PSA_CRYPTO_TF_PSA_CRYPTO_COMMON_H */

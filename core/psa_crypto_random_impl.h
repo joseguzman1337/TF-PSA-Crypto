@@ -7,8 +7,8 @@
  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
-#ifndef PSA_CRYPTO_RANDOM_IMPL_H
-#define PSA_CRYPTO_RANDOM_IMPL_H
+#ifndef TF_PSA_CRYPTO_PSA_CRYPTO_RANDOM_IMPL_H
+#define TF_PSA_CRYPTO_PSA_CRYPTO_RANDOM_IMPL_H
 
 #include "mbedtls/psa_util.h"
 
@@ -147,4 +147,4 @@ static inline int mbedtls_psa_drbg_seed(mbedtls_psa_drbg_context_t *drbg_ctx,
 
 #endif /* MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG */
 
-#endif /* PSA_CRYPTO_RANDOM_IMPL_H */
+#endif /* TF_PSA_CRYPTO_PSA_CRYPTO_RANDOM_IMPL_H */

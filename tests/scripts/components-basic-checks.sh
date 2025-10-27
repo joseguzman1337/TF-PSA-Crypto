@@ -162,3 +162,8 @@ component_tf_psa_crypto_check_doxygen_warnings () {
     msg "Check: doxygen warnings (builds the documentation)" # ~ 3s
     $FRAMEWORK/scripts/doxygen.sh
 }
+
+component_tf_psa_crypto_check_headers_guards() {
+    msg "Check C header files guards"
+    scripts/c_header_guards.py
+}

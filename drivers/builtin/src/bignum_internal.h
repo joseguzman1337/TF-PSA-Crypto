@@ -11,8 +11,8 @@
  *  Copyright The Mbed TLS Contributors
  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
-#ifndef MBEDTLS_BIGNUM_INTERNAL_H
-#define MBEDTLS_BIGNUM_INTERNAL_H
+#ifndef TF_PSA_CRYPTO_BIGNUM_INTERNAL_H
+#define TF_PSA_CRYPTO_BIGNUM_INTERNAL_H
 
 /**
  * \brief          Perform a modular exponentiation: X = A^E mod N
@@ -119,4 +119,4 @@ int mbedtls_mpi_inv_mod_even_in_range(mbedtls_mpi *X,
                                       mbedtls_mpi const *A,
                                       mbedtls_mpi const *N);
 
-#endif /* bignum_internal.h */
+#endif /* TF_PSA_CRYPTO_BIGNUM_INTERNAL_H */

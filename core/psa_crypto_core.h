@@ -6,8 +6,8 @@
  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
-#ifndef PSA_CRYPTO_CORE_H
-#define PSA_CRYPTO_CORE_H
+#ifndef TF_PSA_CRYPTO_PSA_CRYPTO_CORE_H
+#define TF_PSA_CRYPTO_PSA_CRYPTO_CORE_H
 
 #include "tf-psa-crypto/build_info.h"
 
@@ -1073,4 +1073,4 @@ psa_status_t psa_crypto_local_output_alloc(uint8_t *output, size_t output_len,
  */
 psa_status_t psa_crypto_local_output_free(psa_crypto_local_output_t *local_output);
 
-#endif /* PSA_CRYPTO_CORE_H */
+#endif /* TF_PSA_CRYPTO_PSA_CRYPTO_CORE_H */
