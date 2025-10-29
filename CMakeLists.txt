@@ -464,7 +464,7 @@ if(NOT DISABLE_PACKAGE_CONFIG_AND_INSTALL)
     write_basic_package_version_file(
         "cmake/TF-PSA-CryptoConfigVersion.cmake"
             COMPATIBILITY SameMajorVersion
-            VERSION 0.1.0)
+            VERSION "${TF_PSA_CRYPTO_VERSION}")
 
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/cmake/TF-PSA-CryptoConfig.cmake"
