@@ -6,15 +6,15 @@ if(INSTALL_TF_PSA_CRYPTO_HEADERS)
     file(GLOB mbedtls_crypto_headers "../drivers/builtin/include/mbedtls/*.h" "mbedtls/*.h")
 
     install(FILES ${psa_headers}
-        DESTINATION include/psa
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/psa
         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
     install(FILES ${tf-psa-crypto_headers}
-        DESTINATION include/tf-psa-crypto
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/tf-psa-crypto
         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
     install(FILES ${mbedtls_crypto_headers}
-        DESTINATION include/mbedtls
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mbedtls
         PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 endif(INSTALL_TF_PSA_CRYPTO_HEADERS)
 
