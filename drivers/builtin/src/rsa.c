@@ -193,9 +193,7 @@ int mbedtls_rsa_parse_key(mbedtls_rsa_context *rsa, const unsigned char *key, si
     }
 #endif
 
-    /* Check the public part for consistency with mbedtls_pk_parse_pubkey(),
-     * as it includes size minima for example. */
-    if ((ret = mbedtls_rsa_check_pubkey(rsa)) != 0) {
+    if ((ret = mbedtls_rsa_check_privkey(rsa)) != 0) {
         goto cleanup;
     }
 
