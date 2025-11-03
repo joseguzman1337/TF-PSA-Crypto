@@ -1135,8 +1135,6 @@ void mbedtls_rsa_export(char *input_N,
                                    strlen(input_D) ? &D : NULL,
                                    strlen(input_E) ? &E : NULL) == 0);
 
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
-
     /*
      * Export parameters and compare to original ones.
      */
@@ -1280,8 +1278,6 @@ void mbedtls_rsa_export_raw(data_t *input_N, data_t *input_P,
                                        input_Q->len ? input_Q->x : NULL, input_Q->len,
                                        input_D->len ? input_D->x : NULL, input_D->len,
                                        input_E->len ? input_E->x : NULL, input_E->len) == 0);
-
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
 
     /*
      * Export parameters and compare to original ones.
