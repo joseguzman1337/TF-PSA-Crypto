@@ -168,11 +168,13 @@ void mbedtls_rsa_pkcs1_sign(data_t *message_str, int padding_mode,
 {
     unsigned char output[256];
     mbedtls_rsa_context ctx;
-    mbedtls_mpi N, P, Q, E;
+    mbedtls_mpi N, P, Q, E, D, DP, DQ, QP;
     mbedtls_test_rnd_pseudo_info rnd_info;
 
     mbedtls_mpi_init(&N); mbedtls_mpi_init(&P);
     mbedtls_mpi_init(&Q); mbedtls_mpi_init(&E);
+    mbedtls_mpi_init(&D); mbedtls_mpi_init(&DP);
+    mbedtls_mpi_init(&DQ); mbedtls_mpi_init(&QP);
     mbedtls_rsa_init(&ctx);
     TEST_ASSERT(mbedtls_rsa_set_padding(&ctx, padding_mode,
                                         MBEDTLS_MD_NONE) == 0);
@@ -184,11 +186,19 @@ void mbedtls_rsa_pkcs1_sign(data_t *message_str, int padding_mode,
     TEST_ASSERT(mbedtls_test_read_mpi(&Q, input_Q) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&N, input_N) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&E, input_E) == 0);
+    TEST_ASSERT(mbedtls_rsa_deduce_private_exponent(&P, &Q, &E, &D) == 0);
 
-    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, NULL, &E) == 0);
+    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, &D, &E) == 0);
+
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&P, &Q, &D, &DP, &DQ, &QP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQ) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QP) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
+
     TEST_EQUAL(mbedtls_rsa_get_len(&ctx), (size_t) ((mod + 7) / 8));
     TEST_EQUAL(mbedtls_rsa_get_bitlen(&ctx), (size_t) mod);
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
     TEST_ASSERT(mbedtls_rsa_check_privkey(&ctx) == 0);
 
     TEST_ASSERT(mbedtls_rsa_pkcs1_sign(
@@ -204,6 +214,8 @@ void mbedtls_rsa_pkcs1_sign(data_t *message_str, int padding_mode,
 exit:
     mbedtls_mpi_free(&N); mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&Q); mbedtls_mpi_free(&E);
+    mbedtls_mpi_free(&D); mbedtls_mpi_free(&DP);
+    mbedtls_mpi_free(&DQ); mbedtls_mpi_free(&QP);
     mbedtls_rsa_free(&ctx);
 }
 /* END_CASE */
@@ -248,12 +260,14 @@ void rsa_pkcs1_sign_raw(data_t *hash_result,
 {
     unsigned char output[256];
     mbedtls_rsa_context ctx;
-    mbedtls_mpi N, P, Q, E;
+    mbedtls_mpi N, P, Q, E, D, DP, DQ, QP;
     mbedtls_test_rnd_pseudo_info rnd_info;
 
     mbedtls_rsa_init(&ctx);
     mbedtls_mpi_init(&N); mbedtls_mpi_init(&P);
     mbedtls_mpi_init(&Q); mbedtls_mpi_init(&E);
+    mbedtls_mpi_init(&D); mbedtls_mpi_init(&DP);
+    mbedtls_mpi_init(&DQ); mbedtls_mpi_init(&QP);
 
     TEST_ASSERT(mbedtls_rsa_set_padding(&ctx, padding_mode,
                                         MBEDTLS_MD_NONE) == 0);
@@ -265,11 +279,19 @@ void rsa_pkcs1_sign_raw(data_t *hash_result,
     TEST_ASSERT(mbedtls_test_read_mpi(&Q, input_Q) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&N, input_N) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&E, input_E) == 0);
+    TEST_ASSERT(mbedtls_rsa_deduce_private_exponent(&P, &Q, &E, &D) == 0);
 
-    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, NULL, &E) == 0);
+    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, &D, &E) == 0);
+
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&P, &Q, &D, &DP, &DQ, &QP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQ) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QP) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
+
     TEST_EQUAL(mbedtls_rsa_get_len(&ctx), (size_t) ((mod + 7) / 8));
     TEST_EQUAL(mbedtls_rsa_get_bitlen(&ctx), (size_t) mod);
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
     TEST_ASSERT(mbedtls_rsa_check_privkey(&ctx) == 0);
 
 
@@ -285,6 +307,8 @@ void rsa_pkcs1_sign_raw(data_t *hash_result,
 exit:
     mbedtls_mpi_free(&N); mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&Q); mbedtls_mpi_free(&E);
+    mbedtls_mpi_free(&D); mbedtls_mpi_free(&DP);
+    mbedtls_mpi_free(&DQ); mbedtls_mpi_free(&QP);
 
     mbedtls_rsa_free(&ctx);
 }
@@ -422,10 +446,12 @@ void mbedtls_rsa_pkcs1_decrypt(data_t *message_str, int padding_mode,
     mbedtls_rsa_context ctx;
     size_t output_len;
     mbedtls_test_rnd_pseudo_info rnd_info;
-    mbedtls_mpi N, P, Q, E;
+    mbedtls_mpi N, P, Q, E, D, DP, DQ, QP;
 
     mbedtls_mpi_init(&N); mbedtls_mpi_init(&P);
     mbedtls_mpi_init(&Q); mbedtls_mpi_init(&E);
+    mbedtls_mpi_init(&D); mbedtls_mpi_init(&DP);
+    mbedtls_mpi_init(&DQ); mbedtls_mpi_init(&QP);
 
     mbedtls_rsa_init(&ctx);
     TEST_ASSERT(mbedtls_rsa_set_padding(&ctx, padding_mode,
@@ -439,11 +465,19 @@ void mbedtls_rsa_pkcs1_decrypt(data_t *message_str, int padding_mode,
     TEST_ASSERT(mbedtls_test_read_mpi(&Q, input_Q) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&N, input_N) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&E, input_E) == 0);
+    TEST_ASSERT(mbedtls_rsa_deduce_private_exponent(&P, &Q, &E, &D) == 0);
 
-    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, NULL, &E) == 0);
+    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, &D, &E) == 0);
+
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&P, &Q, &D, &DP, &DQ, &QP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQ) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QP) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
+
     TEST_EQUAL(mbedtls_rsa_get_len(&ctx), (size_t) ((mod + 7) / 8));
     TEST_EQUAL(mbedtls_rsa_get_bitlen(&ctx), (size_t) mod);
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
     TEST_ASSERT(mbedtls_rsa_check_privkey(&ctx) == 0);
 
     output_len = 0;
@@ -462,6 +496,8 @@ void mbedtls_rsa_pkcs1_decrypt(data_t *message_str, int padding_mode,
 exit:
     mbedtls_mpi_free(&N); mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&Q); mbedtls_mpi_free(&E);
+    mbedtls_mpi_free(&D); mbedtls_mpi_free(&DP);
+    mbedtls_mpi_free(&DQ); mbedtls_mpi_free(&QP);
     mbedtls_rsa_free(&ctx);
 }
 /* END_CASE */
@@ -535,12 +571,14 @@ void mbedtls_rsa_private(data_t *message_str, int mod,
 {
     unsigned char output[256];
     mbedtls_rsa_context ctx, ctx2; /* Also test mbedtls_rsa_copy() while at it */
-    mbedtls_mpi N, P, Q, E;
+    mbedtls_mpi N, P, Q, E, D, DP, DQ, QP;
     mbedtls_test_rnd_pseudo_info rnd_info;
     int i;
 
     mbedtls_mpi_init(&N); mbedtls_mpi_init(&P);
     mbedtls_mpi_init(&Q); mbedtls_mpi_init(&E);
+    mbedtls_mpi_init(&D); mbedtls_mpi_init(&DP);
+    mbedtls_mpi_init(&DQ); mbedtls_mpi_init(&QP);
     mbedtls_rsa_init(&ctx);
     mbedtls_rsa_init(&ctx2);
 
@@ -550,14 +588,21 @@ void mbedtls_rsa_private(data_t *message_str, int mod,
     TEST_ASSERT(mbedtls_test_read_mpi(&Q, input_Q) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&N, input_N) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&E, input_E) == 0);
+    TEST_ASSERT(mbedtls_rsa_deduce_private_exponent(&P, &Q, &E, &D) == 0);
 
-    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, NULL, &E) == 0);
+    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, &D, &E) == 0);
+
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&P, &Q, &D, &DP, &DQ, &QP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQ) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QP) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
 
     /* Check test data consistency */
     TEST_EQUAL(message_str->len, (size_t) ((mod + 7) / 8));
     TEST_EQUAL(mbedtls_rsa_get_len(&ctx), (size_t) ((mod + 7) / 8));
     TEST_EQUAL(mbedtls_rsa_get_bitlen(&ctx), (size_t) mod);
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
     TEST_ASSERT(mbedtls_rsa_check_privkey(&ctx) == 0);
 
     /* repeat three times to test updating of blinding values */
@@ -601,6 +646,8 @@ void mbedtls_rsa_private(data_t *message_str, int mod,
 exit:
     mbedtls_mpi_free(&N); mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&Q); mbedtls_mpi_free(&E);
+    mbedtls_mpi_free(&D); mbedtls_mpi_free(&DP);
+    mbedtls_mpi_free(&DQ); mbedtls_mpi_free(&QP);
 
     mbedtls_rsa_free(&ctx); mbedtls_rsa_free(&ctx2);
 }
@@ -881,7 +928,7 @@ void mbedtls_rsa_import(char *input_N,
                         int res_check,
                         int res_complete)
 {
-    mbedtls_mpi N, P, Q, D, E;
+    mbedtls_mpi N, P, Q, D, E, DP, DQ, QP;
     mbedtls_rsa_context ctx;
 
     /* Buffers used for encryption-decryption test */
@@ -900,6 +947,8 @@ void mbedtls_rsa_import(char *input_N,
     mbedtls_mpi_init(&N);
     mbedtls_mpi_init(&P); mbedtls_mpi_init(&Q);
     mbedtls_mpi_init(&D); mbedtls_mpi_init(&E);
+    mbedtls_mpi_init(&DP); mbedtls_mpi_init(&DQ);
+    mbedtls_mpi_init(&QP);
 
     if (have_N) {
         TEST_ASSERT(mbedtls_test_read_mpi(&N, input_N) == 0);
@@ -956,7 +1005,12 @@ void mbedtls_rsa_import(char *input_N,
                                        have_E ? &E : NULL) == 0);
     }
 
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == res_complete);
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&P, &Q, &D, &DP, &DQ, &QP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQ) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QP) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
 
     /* On expected success, perform some public and private
      * key operations to check if the key is working properly. */
@@ -1014,6 +1068,8 @@ exit:
     mbedtls_mpi_free(&N);
     mbedtls_mpi_free(&P); mbedtls_mpi_free(&Q);
     mbedtls_mpi_free(&D); mbedtls_mpi_free(&E);
+    mbedtls_mpi_free(&DP); mbedtls_mpi_free(&DQ);
+    mbedtls_mpi_free(&QP);
 }
 /* END_CASE */
 
@@ -1304,10 +1360,12 @@ void mbedtls_rsa_import_raw(data_t *input_N,
     unsigned char *buf_orig = NULL;
     unsigned char *buf_enc  = NULL;
     unsigned char *buf_dec  = NULL;
+    mbedtls_mpi DP, DQ, QP;
 
     mbedtls_rsa_context ctx;
 
     mbedtls_rsa_init(&ctx);
+    mbedtls_mpi_init(&DP); mbedtls_mpi_init(&DQ); mbedtls_mpi_init(&QP);
 
     if (!successive) {
         TEST_ASSERT(mbedtls_rsa_import_raw(&ctx,
@@ -1346,7 +1404,12 @@ void mbedtls_rsa_import_raw(data_t *input_N,
                                            input_E->len) == 0);
     }
 
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == res_complete);
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&ctx.P, &ctx.Q, &ctx.D, &DP, &DQ, &QP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQ) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QP) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
 
     /* On expected success, perform some public and private
      * key operations to check if the key is working properly. */
@@ -1395,6 +1458,7 @@ exit:
     mbedtls_free(buf_orig);
     mbedtls_free(buf_enc);
     mbedtls_free(buf_dec);
+    mbedtls_mpi_free(&DP); mbedtls_mpi_free(&DQ); mbedtls_mpi_free(&QP);
 
     mbedtls_rsa_free(&ctx);
 }

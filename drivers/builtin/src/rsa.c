@@ -2747,9 +2747,10 @@ int mbedtls_rsa_self_test(int verbose)
     unsigned char sha1sum[20];
 #endif
 
-    mbedtls_mpi K;
+    mbedtls_mpi K, DP, DQ, QP;
 
-    mbedtls_mpi_init(&K);
+    mbedtls_mpi_init(&K); mbedtls_mpi_init(&DP);
+    mbedtls_mpi_init(&DQ); mbedtls_mpi_init(&QP);
     mbedtls_rsa_init(&rsa);
 
     MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&K, 16, RSA_N));
@@ -2762,6 +2763,13 @@ int mbedtls_rsa_self_test(int verbose)
     MBEDTLS_MPI_CHK(mbedtls_rsa_import(&rsa, NULL, NULL, NULL, &K, NULL));
     MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&K, 16, RSA_E));
     MBEDTLS_MPI_CHK(mbedtls_rsa_import(&rsa, NULL, NULL, NULL, NULL, &K));
+
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    MBEDTLS_MPI_CHK(mbedtls_rsa_deduce_crt(&rsa.P, &rsa.Q, &rsa.D, &DP, &DQ, &QP));
+    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&rsa.DP, &DP));
+    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&rsa.DQ, &DQ));
+    MBEDTLS_MPI_CHK(mbedtls_mpi_copy(&rsa.QP, &QP));
+#endif /* !MBEDTLS_RSA_NO_CRT */
 
     if (verbose != 0) {
         mbedtls_printf("  RSA key validation: ");
@@ -2871,7 +2879,8 @@ int mbedtls_rsa_self_test(int verbose)
     }
 
 cleanup:
-    mbedtls_mpi_free(&K);
+    mbedtls_mpi_free(&K); mbedtls_mpi_free(&DP);
+    mbedtls_mpi_free(&DQ); mbedtls_mpi_free(&QP);
     mbedtls_rsa_free(&rsa);
 #else /* MBEDTLS_PKCS1_V15 */
     ((void) verbose);

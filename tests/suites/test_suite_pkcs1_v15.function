@@ -1,5 +1,6 @@
 /* BEGIN_HEADER */
 #include "mbedtls/private/rsa.h"
+#include "rsa_alt_helpers.h"
 #include "mbedtls/md.h"
 /* END_HEADER */
 
@@ -73,11 +74,13 @@ void pkcs1_rsaes_v15_decrypt(int mod, char *input_P, char *input_Q,
     mbedtls_rsa_context ctx;
     size_t output_len;
     mbedtls_test_rnd_pseudo_info rnd_info;
-    mbedtls_mpi N, P, Q, E;
+    mbedtls_mpi N, P, Q, E, D, DP, DQ, QP;
     ((void) seed);
 
     mbedtls_mpi_init(&N); mbedtls_mpi_init(&P);
     mbedtls_mpi_init(&Q); mbedtls_mpi_init(&E);
+    mbedtls_mpi_init(&D); mbedtls_mpi_init(&DQ);
+    mbedtls_mpi_init(&DP); mbedtls_mpi_init(&QP);
     mbedtls_rsa_init(&ctx);
     TEST_ASSERT(mbedtls_rsa_set_padding(&ctx,
                                         MBEDTLS_RSA_PKCS_V15, hash) == 0);
@@ -92,10 +95,18 @@ void pkcs1_rsaes_v15_decrypt(int mod, char *input_P, char *input_Q,
     TEST_ASSERT(mbedtls_test_read_mpi(&Q, input_Q) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&N, input_N) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&E, input_E) == 0);
+    TEST_ASSERT(mbedtls_rsa_deduce_private_exponent(&P, &Q, &E, &D) == 0);
 
-    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, NULL, &E) == 0);
+    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, &D, &E) == 0);
+
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&P, &Q, &D, &DP, &DQ, &QP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQ) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QP) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
+
     TEST_ASSERT(mbedtls_rsa_get_len(&ctx) == (size_t) ((mod + 7) / 8));
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
     TEST_ASSERT(mbedtls_rsa_check_privkey(&ctx) == 0);
 
     if (result_str->len == 0) {
@@ -120,6 +131,8 @@ void pkcs1_rsaes_v15_decrypt(int mod, char *input_P, char *input_Q,
 exit:
     mbedtls_mpi_free(&N); mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&Q); mbedtls_mpi_free(&E);
+    mbedtls_mpi_free(&D); mbedtls_mpi_free(&DQ);
+    mbedtls_mpi_free(&DP); mbedtls_mpi_free(&QP);
     mbedtls_rsa_free(&ctx);
 }
 /* END_CASE */
@@ -133,7 +146,7 @@ void pkcs1_v15_decode(data_t *input,
     size_t expected_plaintext_length = expected_plaintext_length_arg;
     size_t output_size = output_size_arg;
     mbedtls_test_rnd_pseudo_info rnd_info;
-    mbedtls_mpi Nmpi, Empi, Pmpi, Qmpi;
+    mbedtls_mpi Nmpi, Empi, Pmpi, Qmpi, Dmpi, DPmpi, DQmpi, QPmpi;
     mbedtls_rsa_context ctx;
     static unsigned char N[128] = {
         0xc4, 0x79, 0x4c, 0x6d, 0xb2, 0xe9, 0xdf, 0xc5,
@@ -201,6 +214,8 @@ void pkcs1_v15_decode(data_t *input,
     memset(&rnd_info, 0, sizeof(mbedtls_test_rnd_pseudo_info));
     mbedtls_mpi_init(&Nmpi); mbedtls_mpi_init(&Empi);
     mbedtls_mpi_init(&Pmpi); mbedtls_mpi_init(&Qmpi);
+    mbedtls_mpi_init(&Dmpi); mbedtls_mpi_init(&DPmpi);
+    mbedtls_mpi_init(&DQmpi); mbedtls_mpi_init(&QPmpi);
     mbedtls_rsa_init(&ctx);
 
     TEST_ASSERT(mbedtls_mpi_read_binary(&Nmpi, N, sizeof(N)) == 0);
@@ -208,9 +223,17 @@ void pkcs1_v15_decode(data_t *input,
     TEST_ASSERT(mbedtls_mpi_read_binary(&Pmpi, P, sizeof(P)) == 0);
     TEST_ASSERT(mbedtls_mpi_read_binary(&Qmpi, Q, sizeof(Q)) == 0);
 
+    TEST_ASSERT(mbedtls_rsa_deduce_private_exponent(&Pmpi, &Qmpi, &Empi, &Dmpi) == 0);
+
     TEST_ASSERT(mbedtls_rsa_import(&ctx, &Nmpi, &Pmpi, &Qmpi,
-                                   NULL, &Empi) == 0);
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
+                                   &Dmpi, &Empi) == 0);
+
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&Pmpi, &Qmpi, &Dmpi, &DPmpi, &DQmpi, &QPmpi) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DPmpi) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQmpi) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QPmpi) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
 
     TEST_ASSERT(input->len <= sizeof(N));
     memcpy(original, input->x, input->len);
@@ -259,6 +282,8 @@ void pkcs1_v15_decode(data_t *input,
 exit:
     mbedtls_mpi_free(&Nmpi); mbedtls_mpi_free(&Empi);
     mbedtls_mpi_free(&Pmpi); mbedtls_mpi_free(&Qmpi);
+    mbedtls_mpi_free(&Dmpi); mbedtls_mpi_free(&DPmpi);
+    mbedtls_mpi_free(&DQmpi); mbedtls_mpi_free(&QPmpi);
     mbedtls_rsa_free(&ctx);
 }
 /* END_CASE */
@@ -272,7 +297,7 @@ void pkcs1_rsassa_v15_sign(int mod, char *input_P,
 {
     unsigned char output[128];
     mbedtls_rsa_context ctx;
-    mbedtls_mpi N, P, Q, E;
+    mbedtls_mpi N, P, Q, E, D, DP, DQ, QP;
     mbedtls_test_rnd_buf_info info;
 
     info.fallback_f_rng = mbedtls_test_rnd_std_rand;
@@ -282,6 +307,8 @@ void pkcs1_rsassa_v15_sign(int mod, char *input_P,
 
     mbedtls_mpi_init(&N); mbedtls_mpi_init(&P);
     mbedtls_mpi_init(&Q); mbedtls_mpi_init(&E);
+    mbedtls_mpi_init(&D); mbedtls_mpi_init(&D);
+    mbedtls_mpi_init(&DQ); mbedtls_mpi_init(&QP);
     mbedtls_rsa_init(&ctx);
     TEST_ASSERT(mbedtls_rsa_set_padding(&ctx,
                                         MBEDTLS_RSA_PKCS_V15, hash) == 0);
@@ -295,10 +322,18 @@ void pkcs1_rsassa_v15_sign(int mod, char *input_P,
     TEST_ASSERT(mbedtls_test_read_mpi(&Q, input_Q) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&N, input_N) == 0);
     TEST_ASSERT(mbedtls_test_read_mpi(&E, input_E) == 0);
+    TEST_ASSERT(mbedtls_rsa_deduce_private_exponent(&P, &Q, &E, &D) == 0);
 
-    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, NULL, &E) == 0);
+    TEST_ASSERT(mbedtls_rsa_import(&ctx, &N, &P, &Q, &D, &E) == 0);
+
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    TEST_ASSERT(mbedtls_rsa_deduce_crt(&P, &Q, &D, &DP, &DQ, &QP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DP, &DP) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.DQ, &DQ) == 0);
+    TEST_ASSERT(mbedtls_mpi_copy(&ctx.QP, &QP) == 0);
+#endif /* !MBEDTLS_RSA_NO_CRT */
+
     TEST_ASSERT(mbedtls_rsa_get_len(&ctx) == (size_t) ((mod + 7) / 8));
-    TEST_ASSERT(mbedtls_rsa_complete(&ctx) == 0);
     TEST_ASSERT(mbedtls_rsa_check_privkey(&ctx) == 0);
 
     TEST_ASSERT(mbedtls_rsa_pkcs1_sign(
@@ -314,6 +349,8 @@ void pkcs1_rsassa_v15_sign(int mod, char *input_P,
 exit:
     mbedtls_mpi_free(&N); mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&Q); mbedtls_mpi_free(&E);
+    mbedtls_mpi_free(&D); mbedtls_mpi_free(&DP);
+    mbedtls_mpi_free(&DQ); mbedtls_mpi_free(&QP);
     mbedtls_rsa_free(&ctx);
 }
 /* END_CASE */
