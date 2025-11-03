@@ -51,9 +51,7 @@
 /*
  * Wrapper around mbedtls_asn1_get_mpi() that rejects zero.
  *
- * The value zero is:
- * - never a valid value for an RSA parameter
- * - interpreted as "omitted, please reconstruct" by mbedtls_rsa_complete().
+ * The value zero is never a valid value for an RSA parameter.
  *
  * Since values can't be omitted in PKCS#1, passing a zero value to
  * rsa_complete() would be incorrect, so reject zero values early.
@@ -195,17 +193,9 @@ int mbedtls_rsa_parse_key(mbedtls_rsa_context *rsa, const unsigned char *key, si
     }
 #endif
 
-    /* rsa_complete() doesn't complete anything with the default
-     * implementation but is still called:
-     * - for the benefit of alternative implementation that may want to
-     *   pre-compute stuff beyond what's provided (eg Montgomery factors)
-     * - as is also sanity-checks the key
-     *
-     * Furthermore, we also check the public part for consistency with
-     * mbedtls_pk_parse_pubkey(), as it includes size minima for example.
-     */
-    if ((ret = mbedtls_rsa_complete(rsa)) != 0 ||
-        (ret = mbedtls_rsa_check_pubkey(rsa)) != 0) {
+    /* Check the public part for consistency with mbedtls_pk_parse_pubkey(),
+     * as it includes size minima for example. */
+    if ((ret = mbedtls_rsa_check_pubkey(rsa)) != 0) {
         goto cleanup;
     }
 
@@ -271,8 +261,7 @@ int mbedtls_rsa_parse_pubkey(mbedtls_rsa_context *rsa, const unsigned char *key,
 
     p += len;
 
-    if (mbedtls_rsa_complete(rsa) != 0 ||
-        mbedtls_rsa_check_pubkey(rsa) != 0) {
+    if (mbedtls_rsa_check_pubkey(rsa) != 0) {
         return MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
     }
 
@@ -2775,8 +2764,6 @@ int mbedtls_rsa_self_test(int verbose)
     MBEDTLS_MPI_CHK(mbedtls_rsa_import(&rsa, NULL, NULL, NULL, &K, NULL));
     MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&K, 16, RSA_E));
     MBEDTLS_MPI_CHK(mbedtls_rsa_import(&rsa, NULL, NULL, NULL, NULL, &K));
-
-    MBEDTLS_MPI_CHK(mbedtls_rsa_complete(&rsa));
 
     if (verbose != 0) {
         mbedtls_printf("  RSA key validation: ");
