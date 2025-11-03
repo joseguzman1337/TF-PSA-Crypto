@@ -253,40 +253,6 @@ int mbedtls_rsa_import_raw(mbedtls_rsa_context *ctx,
                            unsigned char const *E, size_t E_len);
 
 /**
- * \brief          This function completes an RSA context from
- *                 a set of imported core parameters.
- *
- *                 To setup an RSA public key, precisely \c N and \c E
- *                 must have been imported.
- *
- *                 To setup an RSA private key, sufficient information must
- *                 be present for the other parameters to be derivable.
- *
- *                 The default implementation supports the following:
- *                 <ul><li>Derive \c P, \c Q from \c N, \c D, \c E.</li>
- *                 <li>Derive \c N, \c D from \c P, \c Q, \c E.</li></ul>
- *                 Alternative implementations need not support these.
- *
- *                 If this function runs successfully, it guarantees that
- *                 the RSA context can be used for RSA operations without
- *                 the risk of failure or crash.
- *
- * \warning        This function need not perform consistency checks
- *                 for the imported parameters. In particular, parameters that
- *                 are not needed by the implementation might be silently
- *                 discarded and left unchecked. To check the consistency
- *                 of the key material, see mbedtls_rsa_check_privkey().
- *
- * \param ctx      The initialized RSA context holding imported parameters.
- *
- * \return         \c 0 on success.
- * \return         #MBEDTLS_ERR_RSA_BAD_INPUT_DATA if the attempted derivations
- *                 failed.
- *
- */
-int mbedtls_rsa_complete(mbedtls_rsa_context *ctx);
-
-/**
  * \brief          This function exports the core parameters of an RSA key.
  *
  *                 If this function runs successfully, the non-NULL buffers
