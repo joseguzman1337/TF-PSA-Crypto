@@ -2171,7 +2171,7 @@ void pk_get_key_type_wrap_psa(int key_type_arg, int bits)
     psa_key_id_t key = 0;
     psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
-    psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
+    psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t returned_key_type;
 
     mbedtls_pk_init(&ctx);
@@ -2208,7 +2208,7 @@ exit:
 /* BEGIN_CASE depends_on:MBEDTLS_FS_IO:MBEDTLS_PK_PARSE_C */
 void pk_get_key_type_parse_key(char *key_file, int key_type_arg)
 {
-    psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
+    psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t returned_key_type;
 
     mbedtls_pk_context ctx;
@@ -2230,7 +2230,7 @@ exit:
 /* BEGIN_CASE depends_on:MBEDTLS_FS_IO:MBEDTLS_PK_PARSE_C */
 void pk_get_key_type_parse_public_key(char *key_file, int key_type_arg)
 {
-    psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
+    psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t returned_key_type;
 
     mbedtls_pk_context ctx;
@@ -2255,7 +2255,7 @@ void pk_get_key_type_copy_from_psa_keypair(int key_type_arg, int bits)
     psa_key_id_t key = 0;
     psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
-    psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
+    psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t returned_key_type;
 
     mbedtls_pk_init(&ctx);
@@ -2296,7 +2296,7 @@ void pk_get_key_type_copy_from_psa_public(int key_type_arg, int bits)
     psa_key_id_t public_key = 0;
     psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
-    psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
+    psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t keypair_type;
     psa_key_type_t returned_key_type;
 
@@ -2360,7 +2360,7 @@ void pk_get_key_type_copy_public_from_psa(int key_type_arg, int bits)
     psa_key_id_t keypair = 0;
     psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
-    psa_key_type_t key_type = (psa_key_id_t) key_type_arg;
+    psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t keypair_type;
     psa_key_type_t returned_key_type;
 
