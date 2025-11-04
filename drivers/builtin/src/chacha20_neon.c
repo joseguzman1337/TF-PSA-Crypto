@@ -65,13 +65,9 @@ static inline uint32x4_t chacha20_neon_vrotlq_7_u32(uint32x4_t v)
 // Increment the 32-bit element within v that corresponds to the ChaCha20 counter
 static inline uint32x4_t chacha20_neon_inc_counter(uint32x4_t v)
 {
-    if (MBEDTLS_IS_BIG_ENDIAN) {
-        uint32x4_t counter_increment = { 0, 0, 0, 1 };
-        return vaddq_u32(v, counter_increment);
-    } else {
-        uint32x4_t counter_increment = { 1, 0, 0, 0 };
-        return vaddq_u32(v, counter_increment);
-    }
+    /* { 1, 0, 0, 0 } */
+    uint32x4_t counter_increment = vcombine_u32(vcreate_u32(1), vdup_n_u32(0));
+    return vaddq_u32(v, counter_increment);
 }
 
 static inline chacha20_neon_regs_t chacha20_neon_singlepass(chacha20_neon_regs_t r)
