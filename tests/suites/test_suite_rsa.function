@@ -739,48 +739,6 @@ exit:
 /* END_CASE */
 
 /* BEGIN_CASE */
-void mbedtls_rsa_deduce_primes(char *input_N,
-                               char *input_D,
-                               char *input_E,
-                               char *output_P,
-                               char *output_Q,
-                               int corrupt, int result)
-{
-    mbedtls_mpi N, P, Pp, Q, Qp, D, E;
-
-    mbedtls_mpi_init(&N);
-    mbedtls_mpi_init(&P);  mbedtls_mpi_init(&Q);
-    mbedtls_mpi_init(&Pp); mbedtls_mpi_init(&Qp);
-    mbedtls_mpi_init(&D); mbedtls_mpi_init(&E);
-
-    TEST_ASSERT(mbedtls_test_read_mpi(&N, input_N) == 0);
-    TEST_ASSERT(mbedtls_test_read_mpi(&D, input_D) == 0);
-    TEST_ASSERT(mbedtls_test_read_mpi(&E, input_E) == 0);
-    TEST_ASSERT(mbedtls_test_read_mpi(&Qp, output_P) == 0);
-    TEST_ASSERT(mbedtls_test_read_mpi(&Pp, output_Q) == 0);
-
-    if (corrupt) {
-        TEST_ASSERT(mbedtls_mpi_add_int(&D, &D, 2) == 0);
-    }
-
-    /* Try to deduce P, Q from N, D, E only. */
-    TEST_ASSERT(mbedtls_rsa_deduce_primes(&N, &D, &E, &P, &Q) == result);
-
-    if (!corrupt) {
-        /* Check if (P,Q) = (Pp, Qp) or (P,Q) = (Qp, Pp) */
-        TEST_ASSERT((mbedtls_mpi_cmp_mpi(&P, &Pp) == 0 && mbedtls_mpi_cmp_mpi(&Q, &Qp) == 0) ||
-                    (mbedtls_mpi_cmp_mpi(&P, &Qp) == 0 && mbedtls_mpi_cmp_mpi(&Q, &Pp) == 0));
-    }
-
-exit:
-    mbedtls_mpi_free(&N);
-    mbedtls_mpi_free(&P); mbedtls_mpi_free(&Q);
-    mbedtls_mpi_free(&Pp); mbedtls_mpi_free(&Qp);
-    mbedtls_mpi_free(&D); mbedtls_mpi_free(&E);
-}
-/* END_CASE */
-
-/* BEGIN_CASE */
 void mbedtls_rsa_deduce_private_exponent(char *input_P,
                                          char *input_Q,
                                          char *input_E,
