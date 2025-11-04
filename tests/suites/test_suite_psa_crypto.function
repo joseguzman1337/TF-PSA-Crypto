@@ -1686,7 +1686,12 @@ exit:
 /* BEGIN_CASE depends_on:MBEDTLS_ASN1_WRITE_C */
 /* Import an RSA key with a valid structure (but not valid numbers
  * inside, beyond having sensible size and parity). This is expected to
- * fail for large keys. */
+ * fail for large keys.
+ * Warning: this test solution is weak: it builds RSA contexts with invalid
+ * parameters and it simply relies on the fact that the bit-size check is
+ * performed BEFORE any context validity. Issue tf-psa-crypto#562 describes
+ * this problem and aims at fixing it.
+ * */
 void import_rsa_made_up(int bits_arg, int keypair, int expected_status_arg)
 {
     mbedtls_svc_key_id_t key = MBEDTLS_SVC_KEY_ID_INIT;

@@ -77,7 +77,7 @@ static int asn1_get_nonzero_mpi(unsigned char **p,
 int mbedtls_rsa_parse_key(mbedtls_rsa_context *rsa, const unsigned char *key, size_t keylen)
 {
     int ret, version;
-    size_t len;
+    size_t len, bits;
     unsigned char *p, *end;
 
     mbedtls_mpi T;
@@ -192,6 +192,15 @@ int mbedtls_rsa_parse_key(mbedtls_rsa_context *rsa, const unsigned char *key, si
         goto cleanup;
     }
 #endif
+
+    /* This check here is a duplication of the one in "mbedtls_psa_rsa_load_representation"
+     * in "psa_crypto_rsa.c". The reason for which this is needed here is explained
+     * in issue tf-psa-crypto#562. */
+    bits = PSA_BYTES_TO_BITS(mbedtls_rsa_get_len(rsa));
+    if (bits > PSA_VENDOR_RSA_MAX_KEY_BITS) {
+        ret = PSA_ERROR_NOT_SUPPORTED;
+        goto cleanup;
+    }
 
     if ((ret = mbedtls_rsa_check_privkey(rsa)) != 0) {
         goto cleanup;
