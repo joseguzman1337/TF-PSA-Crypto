@@ -1496,7 +1496,7 @@ depends_on:PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY:PSA_WANT_ECC_MONTGOMERY_255
 pk_copy_public_from_psa:"a546e36bf0527c9d3b16154b82465edd62144c0ac1fc5a18506a2244ba449ac4":PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY)
 
 PK get type from wrapped PSA key, RSA
-depends_on:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_BASIC
+depends_on:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_BASIC:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_GENERATE
 pk_get_key_type_wrap_psa:PSA_KEY_TYPE_RSA_KEY_PAIR:3072
 
 PK get type from wrapped PSA key, SECP_R1
@@ -1552,7 +1552,7 @@ depends_on:PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY:PSA_WANT_ECC_SECP_R1_521
 pk_get_key_type_parse_public_key:"../framework/data_files/ec_521_pub.der":PSA_KEY_TYPE_ECC_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_R1)
 
 PK get type from copied PSA keypair, RSA
-depends_on:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_BASIC
+depends_on:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_BASIC:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_GENERATE
 pk_get_key_type_copy_from_psa_keypair:PSA_KEY_TYPE_RSA_KEY_PAIR:3072
 
 PK get type from copied PSA keypair, SECP_R1
@@ -1564,7 +1564,7 @@ depends_on:PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_BASIC
 pk_get_key_type_copy_from_psa_keypair:PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_K1):256
 
 PK get type from copied PSA public key, RSA
-depends_on:PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
+depends_on:PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_GENERATE
 pk_get_key_type_copy_from_psa_public:PSA_KEY_TYPE_RSA_PUBLIC_KEY:3072
 
 PK get type from copied PSA public key, SECP_R1
@@ -1576,7 +1576,7 @@ depends_on:PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
 pk_get_key_type_copy_from_psa_public:PSA_KEY_TYPE_ECC_PUBLIC_KEY(PSA_ECC_FAMILY_SECP_K1):256
 
 PK get type, public key copied from PSA, RSA
-depends_on:PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
+depends_on:PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_GENERATE
 pk_get_key_type_copy_public_from_psa:PSA_KEY_TYPE_RSA_PUBLIC_KEY:3072
 
 PK get type, public key copied from PSA, SECP_R1
