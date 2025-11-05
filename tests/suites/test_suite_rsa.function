@@ -1972,6 +1972,7 @@ void pkcs1_rsassa_pss_sign(int mod, data_t *input_P, data_t *input_Q,
     }
 
 exit:
+    mbedtls_rsa_free(&ctx);
     MD_PSA_DONE();
 }
 /* END_CASE */
