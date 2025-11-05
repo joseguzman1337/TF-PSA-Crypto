@@ -784,7 +784,7 @@
  *
  * - 4 bytes of SEQUENCE overhead;
  * - 3 bytes of version;
- * - 7 half-size INTEGERs plus 2 full-size INTEGERs,
+ * - 5 half-size INTEGERs plus 2 full-size INTEGERs,
  *   overapproximated as 9 half-size INTEGERS;
  * - 7 bytes for the public exponent.
  */
