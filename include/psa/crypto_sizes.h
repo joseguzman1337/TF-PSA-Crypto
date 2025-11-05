@@ -748,9 +748,14 @@
  * - 1 type byte;
  * - 1 to 3 length bytes;
  * - 0 to 1 bytes of leading 0 due to the sign bit.
+ *
+ * Perform an integer ceil() operation on the bit length to get the required
+ * byte length, in case a non-exact number of bytes is supplied:
+ *
+ * ceil(x/8) = 1 + (x - 1) / 8
  */
 #define PSA_KEY_EXPORT_ASN1_INTEGER_MAX_SIZE(bits)      \
-    ((bits) / 8u + 5u)
+    (1u + ((bits) - 1u) / 8u + 5u)
 
 /* Maximum size of the export encoding of an RSA public key.
  * Assumes that the public exponent is less than 2^32.
