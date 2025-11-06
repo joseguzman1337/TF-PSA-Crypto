@@ -1,9 +1,7 @@
 ECDH - Invalid parameters
 ecdh_invalid_param:
 
-ECDH primitive random #1
-depends_on:MBEDTLS_ECP_DP_SECP192R1_ENABLED
-ecdh_primitive_random:MBEDTLS_ECP_DP_SECP192R1
+# Test case #1 was removed because it was using curve secp192r1 which has been removed
 
 # Test case #2 was removed because it was using curve secp224r1 which has been removed
 
