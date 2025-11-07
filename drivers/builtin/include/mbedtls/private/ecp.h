@@ -51,14 +51,12 @@
 #if defined(MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS)
 /* Flags indicating whether to include code that is specific to certain
  * types of curves. These flags are for internal library use only. */
-#if defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED) || \
-    defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED) || \
+#if defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_SECP384R1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_SECP521R1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_BP256R1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_BP384R1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_BP512R1_ENABLED) || \
-    defined(MBEDTLS_ECP_DP_SECP192K1_ENABLED) || \
     defined(MBEDTLS_ECP_DP_SECP256K1_ENABLED)
 #define MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED
 #endif
@@ -330,10 +328,6 @@ mbedtls_ecp_group;
 #define MBEDTLS_ECP_MAX_BITS 256
 #elif defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
 #define MBEDTLS_ECP_MAX_BITS 255
-#elif defined(MBEDTLS_ECP_DP_SECP192K1_ENABLED)
-#define MBEDTLS_ECP_MAX_BITS 192
-#elif defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED)
-#define MBEDTLS_ECP_MAX_BITS 192
 #else /* !MBEDTLS_ECP_LIGHT */
 #error "Missing definition of MBEDTLS_ECP_MAX_BITS"
 #endif /* !MBEDTLS_ECP_LIGHT */
