@@ -233,15 +233,15 @@ ECP read binary #4b (non-zero, invalid ilen, too short)
 depends_on:MBEDTLS_ECP_DP_SECP256R1_ENABLED
 ecp_read_binary:MBEDTLS_ECP_DP_SECP256R1:"02001122":"01":"01":"00":MBEDTLS_ERR_ECP_BAD_INPUT_DATA
 
-ECP read binary #4c (non-zero, invalid ilen, too long)
+ECP read binary #4c (non-zero, uncompressed, ilen too long)
 depends_on:MBEDTLS_ECP_DP_SECP256R1_ENABLED
 ecp_read_binary:MBEDTLS_ECP_DP_SECP256R1:"0400112233445566778899001122334455667788990011223344556677889900112233":"01":"01":"00":MBEDTLS_ERR_ECP_BAD_INPUT_DATA
 
-ECP read binary #4d (non-zero, invalid ilen, too long)
+ECP read binary #4d (non-zero, compressed, parity 0, ilen too long)
 depends_on:MBEDTLS_ECP_DP_SECP256R1_ENABLED
 ecp_read_binary:MBEDTLS_ECP_DP_SECP256R1:"0300112233445566778899001122334455667788990011223344556677889900112233":"01":"01":"00":MBEDTLS_ERR_ECP_BAD_INPUT_DATA
 
-ECP read binary #4e (non-zero, invalid ilen, too long)
+ECP read binary #4e (non-zero, compressed, parity 1, ilen too long)
 depends_on:MBEDTLS_ECP_DP_SECP256R1_ENABLED
 ecp_read_binary:MBEDTLS_ECP_DP_SECP256R1:"0200112233445566778899001122334455667788990011223344556677889900112233":"01":"01":"00":MBEDTLS_ERR_ECP_BAD_INPUT_DATA
 
@@ -1320,7 +1320,7 @@ ecp_mul_inv #48 MBEDTLS_ECP_MOD_SCALAR(MBEDTLS_ECP_DP_CURVE448)
 depends_on:MBEDTLS_ECP_DP_CURVE448_ENABLED
 ecp_mod_mul_inv:"0000000000000003fffffffffffffffffffffffffffffffffffffffffffffffffffffff01243a939d867d7e0a75a8568d4d66de88f3ecc1ad37f91a8f9d7d70":MBEDTLS_ECP_DP_CURVE448:MBEDTLS_ECP_MOD_SCALAR
 
-# Test cases #49, #50, #51 and #52 were removed because they were using curve secp192r1 which has been removed
+# Test cases #49, #50, #51 and #51.1 were removed because they were using curve secp192r1 which has been removed
 
 # Test cases #52, #53, #54 were removed because they were using curve secp224r1 which has been removed
 
@@ -1388,7 +1388,7 @@ ecp_mul_inv #66.1 MBEDTLS_ECP_MOD_COORDINATE(MBEDTLS_ECP_DP_CURVE25519)
 depends_on:MBEDTLS_ECP_DP_CURVE25519_ENABLED
 ecp_mod_mul_inv:"7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffec":MBEDTLS_ECP_DP_CURVE25519:MBEDTLS_ECP_MOD_COORDINATE
 
-# Test cases #67, #68, #69 and #70 were removed because they were using curve secp192k1 which has been removed
+# Test cases #67, #68, #69 and #69.1 were removed because they were using curve secp192k1 which has been removed
 
 # Test cases from #70 to #75 were removed because they were using curve secp224k1 which has been removed
 
