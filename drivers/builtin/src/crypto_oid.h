@@ -87,7 +87,6 @@
  */
 #define MBEDTLS_OID_INTERNET                    MBEDTLS_OID_ISO_IDENTIFIED_ORG MBEDTLS_OID_ORG_DOD \
     "\x01"
-#define MBEDTLS_OID_PKIX                        MBEDTLS_OID_INTERNET "\x05\x05\x07"
 
 /*
  * PKCS definition OIDs
