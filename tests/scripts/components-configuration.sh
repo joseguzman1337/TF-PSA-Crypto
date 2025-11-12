@@ -236,16 +236,18 @@ component_test_psa_assume_exclusive_buffers_valgrind_cf () {
 component_tf_psa_crypto_full_no_pkparse_pkwrite () {
     msg "build: full without pkparse and pkwrite"
 
-    scripts/config.py crypto_full
+    scripts/config.py full
     scripts/config.py unset MBEDTLS_PK_PARSE_C
     scripts/config.py unset MBEDTLS_PK_WRITE_C
 
-    $MAKE_COMMAND CFLAGS="$ASAN_CFLAGS" LDFLAGS="$ASAN_CFLAGS"
+    cd "$OUT_OF_SOURCE_DIR"
+    cmake -DCMAKE_BUILD_TYPE:String=Asan "$TF_PSA_CRYPTO_ROOT_DIR"
+    make
 
     # Ensure that PK_[PARSE|WRITE]_C were not re-enabled accidentally (additive config).
-    not grep mbedtls_pk_parse_key ${BUILTIN_SRC_PATH}/pkparse.o
-    not grep mbedtls_pk_write_key_der ${BUILTIN_SRC_PATH}/pkwrite.o
+    not grep mbedtls_pk_parse_key "core/libtfpsacrypto.a"
+    not grep mbedtls_pk_write_key_der "core/libtfpsacrypto.a"
 
     msg "test: full without pkparse and pkwrite"
-    $MAKE_COMMAND test
+    make test
 }
