@@ -931,7 +931,7 @@ int mbedtls_rsa_rsassa_pss_sign_ext(mbedtls_rsa_context *ctx,
  *                 verification.
  *
  * \note           For PKCS#1 v2.1 encoding, see comments on
- *                 mbedtls_rsa_rsassa_pss_verify() about \c md_alg and
+ *                 mbedtls_rsa_rsassa_pss_verify_ext() about \c md_alg and
  *                 \c hash_id.
  *
  * \param ctx      The initialized RSA public key context to use.
