@@ -805,7 +805,7 @@ int mbedtls_rsa_rsaes_oaep_decrypt(mbedtls_rsa_context *ctx,
  *                 of \p ctx->N. For example, 128 Bytes if RSA-1024 is used.
  *
  * \note           For PKCS#1 v2.1 encoding, see comments on
- *                 mbedtls_rsa_rsassa_pss_sign() for details on
+ *                 mbedtls_rsa_rsassa_pss_sign_ext() for details on
  *                 \p md_alg and \p hash_id.
  *
  * \param ctx      The initialized RSA context to use.
