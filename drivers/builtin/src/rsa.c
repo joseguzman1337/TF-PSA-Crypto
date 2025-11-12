@@ -2645,7 +2645,6 @@ int mbedtls_rsa_pkcs1_verify(mbedtls_rsa_context *ctx,
                              const unsigned char *hash,
                              const unsigned char *sig)
 {
-    mbedtls_md_type_t mgf1_hash_id;
     if ((md_alg != MBEDTLS_MD_NONE || hashlen != 0) && hash == NULL) {
         return MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
     }
@@ -2659,6 +2658,7 @@ int mbedtls_rsa_pkcs1_verify(mbedtls_rsa_context *ctx,
 
 #if defined(MBEDTLS_PKCS1_V21)
         case MBEDTLS_RSA_PKCS_V21:
+            mbedtls_md_type_t mgf1_hash_id;
             mgf1_hash_id = (ctx->hash_id != MBEDTLS_MD_NONE)
                                      ? (mbedtls_md_type_t) ctx->hash_id
                                      : md_alg;
