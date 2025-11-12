@@ -232,3 +232,20 @@ component_test_psa_assume_exclusive_buffers_valgrind_cf () {
     msg "test: full config + MBEDTLS_PSA_ASSUME_EXCLUSIVE_BUFFERS, constant flow with Valgrind, selected suites"
     test_with_valgrind_constant_time tests/suites/*constant_time*.data
 }
+
+component_tf_psa_crypto_full_no_pkparse_pkwrite () {
+    msg "build: full without pkparse and pkwrite"
+
+    scripts/config.py crypto_full
+    scripts/config.py unset MBEDTLS_PK_PARSE_C
+    scripts/config.py unset MBEDTLS_PK_WRITE_C
+
+    $MAKE_COMMAND CFLAGS="$ASAN_CFLAGS" LDFLAGS="$ASAN_CFLAGS"
+
+    # Ensure that PK_[PARSE|WRITE]_C were not re-enabled accidentally (additive config).
+    not grep mbedtls_pk_parse_key ${BUILTIN_SRC_PATH}/pkparse.o
+    not grep mbedtls_pk_write_key_der ${BUILTIN_SRC_PATH}/pkwrite.o
+
+    msg "test: full without pkparse and pkwrite"
+    $MAKE_COMMAND test
+}
