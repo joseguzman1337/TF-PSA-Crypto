@@ -1122,7 +1122,7 @@ int mbedtls_pk_verify_ext(mbedtls_pk_sigalg_t type,
     }
 
     if (type != MBEDTLS_PK_SIGALG_RSA_PSS) {
-        return mbedtls_pk_verify_restartable(ctx, md_alg, hash, hash_len, sig, sig_len, NULL);
+        return mbedtls_pk_verify(ctx, md_alg, hash, hash_len, sig, sig_len);
     }
 
     /* Ensure the PK context is of the right type. */
@@ -1268,8 +1268,8 @@ int mbedtls_pk_sign_ext(mbedtls_pk_sigalg_t pk_type,
     }
 
     if (pk_type != MBEDTLS_PK_SIGALG_RSA_PSS) {
-        return mbedtls_pk_sign_restartable(ctx, md_alg, hash, hash_len,
-                                           sig, sig_size, sig_len, NULL);
+        return mbedtls_pk_sign(ctx, md_alg, hash, hash_len,
+                               sig, sig_size, sig_len);
     }
 
 #if defined(PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY)
