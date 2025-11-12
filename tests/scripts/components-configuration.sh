@@ -274,3 +274,11 @@ common_tf_psa_crypto_full_pkparse_pkwrite () {
 component_tf_psa_crypto_full_no_pkparse_pkwrite () {
     common_tf_psa_crypto_full_pkparse_pkwrite 0 0
 }
+
+component_tf_psa_crypto_full_no_pkwrite () {
+    common_tf_psa_crypto_full_pkparse_pkwrite 1 0
+}
+
+component_tf_psa_crypto_full_no_pkparse () {
+    common_tf_psa_crypto_full_pkparse_pkwrite 0 1
+}
