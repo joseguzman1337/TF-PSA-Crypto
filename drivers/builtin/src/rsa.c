@@ -2441,7 +2441,7 @@ int mbedtls_rsa_pkcs1_sign(mbedtls_rsa_context *ctx,
 #if defined(MBEDTLS_PKCS1_V21)
         case MBEDTLS_RSA_PKCS_V21:
             return mbedtls_rsa_rsassa_pss_sign_ext(ctx, f_rng, p_rng, md_alg,
-                                       hashlen, hash, MBEDTLS_RSA_SALT_LEN_ANY, sig);
+                                                   hashlen, hash, MBEDTLS_RSA_SALT_LEN_ANY, sig);
 #endif
 
         default:
