@@ -299,7 +299,10 @@ void mbedtls_asn1_write_algorithm_identifier_ext(data_t *oid,
             TEST_CALLOC(buf_complete, len_complete);
             unsigned char *end_complete = buf_complete + len_complete;
             memcpy(buf_complete, data.p, data_len);
-            if (par_len == 0) {
+            if (has_par == 0) {
+                expected_params_tag = 0;
+                expected_params_len = 0;
+            } else if (par_len == 0) {
                 /* mbedtls_asn1_write_algorithm_identifier() wrote a NULL */
                 expected_params_tag = 0x05;
                 expected_params_len = 0;
