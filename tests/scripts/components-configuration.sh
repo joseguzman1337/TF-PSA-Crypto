@@ -245,7 +245,7 @@ common_tf_psa_crypto_full_pkparse_pkwrite () {
         message="$message pkwrite"
     fi
 
-    msg "build:$message"
+    msg "build: $message"
 
     scripts/config.py full
     if [ $PK_PARSE -eq 0 ]; then
@@ -267,7 +267,7 @@ common_tf_psa_crypto_full_pkparse_pkwrite () {
         not grep mbedtls_pk_write_key_der "core/libtfpsacrypto.a"
     fi
 
-    msg "test:$message"
+    msg "test: $message"
     make test
 }
 
