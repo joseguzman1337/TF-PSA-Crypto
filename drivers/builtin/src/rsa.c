@@ -52,9 +52,6 @@
  * Wrapper around mbedtls_asn1_get_mpi() that rejects zero.
  *
  * The value zero is never a valid value for an RSA parameter.
- *
- * Since values can't be omitted in PKCS#1, passing a zero value to
- * rsa_complete() would be incorrect, so reject zero values early.
  */
 static int asn1_get_nonzero_mpi(unsigned char **p,
                                 const unsigned char *end,
