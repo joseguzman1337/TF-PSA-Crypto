@@ -259,12 +259,17 @@ common_tf_psa_crypto_full_pkparse_pkwrite () {
     cmake -DCMAKE_BUILD_TYPE:String=Asan "$TF_PSA_CRYPTO_ROOT_DIR"
     make
 
-    # Ensure that PK_PARSE_C and/or PK_PARSE_C were not re-enabled accidentally (additive config).
+    # Ensure that PK_PARSE_C and/or PK_PARSE_C are correctly disabled or enabled
+    # depending on the current scenario.
     if [ $PK_PARSE -eq 0 ]; then
         not grep mbedtls_pk_parse_key "core/libtfpsacrypto.a"
+    else
+        grep mbedtls_pk_parse_key "core/libtfpsacrypto.a"
     fi
     if [ $PK_WRITE -eq 0 ]; then
         not grep mbedtls_pk_write_key_der "core/libtfpsacrypto.a"
+    else
+        grep mbedtls_pk_write_key_der "core/libtfpsacrypto.a"
     fi
 
     msg "test: $message"
