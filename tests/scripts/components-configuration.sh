@@ -232,3 +232,58 @@ component_test_psa_assume_exclusive_buffers_valgrind_cf () {
     msg "test: full config + MBEDTLS_PSA_ASSUME_EXCLUSIVE_BUFFERS, constant flow with Valgrind, selected suites"
     test_with_valgrind_constant_time tests/suites/*constant_time*.data
 }
+
+common_tf_psa_crypto_full_pkparse_pkwrite () {
+    PK_PARSE=$1
+    PK_WRITE=$2
+
+    message="full without"
+    if [ $PK_PARSE -eq 0 ]; then
+        message="$message pkparse"
+    fi
+    if [ $PK_WRITE -eq 0 ]; then
+        message="$message pkwrite"
+    fi
+
+    msg "build: $message"
+
+    scripts/config.py full
+    if [ $PK_PARSE -eq 0 ]; then
+        scripts/config.py unset MBEDTLS_PK_PARSE_C
+    fi
+    if [ $PK_WRITE -eq 0 ]; then
+        scripts/config.py unset MBEDTLS_PK_WRITE_C
+    fi
+
+    cd "$OUT_OF_SOURCE_DIR"
+    cmake -DCMAKE_BUILD_TYPE:String=Asan "$TF_PSA_CRYPTO_ROOT_DIR"
+    make
+
+    # Ensure that PK_PARSE_C and/or PK_PARSE_C are correctly disabled or enabled
+    # depending on the current scenario.
+    if [ $PK_PARSE -eq 0 ]; then
+        not grep mbedtls_pk_parse_key "core/libtfpsacrypto.a"
+    else
+        grep mbedtls_pk_parse_key "core/libtfpsacrypto.a"
+    fi
+    if [ $PK_WRITE -eq 0 ]; then
+        not grep mbedtls_pk_write_key_der "core/libtfpsacrypto.a"
+    else
+        grep mbedtls_pk_write_key_der "core/libtfpsacrypto.a"
+    fi
+
+    msg "test: $message"
+    make test
+}
+
+component_tf_psa_crypto_full_no_pkparse_pkwrite () {
+    common_tf_psa_crypto_full_pkparse_pkwrite 0 0
+}
+
+component_tf_psa_crypto_full_no_pkwrite () {
+    common_tf_psa_crypto_full_pkparse_pkwrite 1 0
+}
+
+component_tf_psa_crypto_full_no_pkparse () {
+    common_tf_psa_crypto_full_pkparse_pkwrite 0 1
+}
