@@ -281,6 +281,24 @@ void mbedtls_asn1_write_algorithm_identifier_ext(data_t *oid,
         if (!generic_write_finish_step(&data, expected, ret)) {
             goto exit;
         }
+        if (has_par == 1) {
+            if (!generic_write_start_step(&data)) {
+                goto exit;
+            }
+            ret = mbedtls_asn1_write_algorithm_identifier(
+                &data.p, data.start,
+                (const char *) oid->x, oid->len, par_len);
+            /* If params_len != 0, mbedtls_asn1_write_algorithm_identifier()
+             * assumes that the parameters are already present in the buffer
+             * and returns a length that accounts for this, but our test
+             * data omits the parameters. */
+            if (ret >= 0) {
+                ret -= par_len;
+            }
+            if (!generic_write_finish_step(&data, expected, ret)) {
+                goto exit;
+            }
+        }
 
 #if defined(MBEDTLS_ASN1_PARSE_C)
         /* Only do a parse-back test if the parameters aren't too large for
