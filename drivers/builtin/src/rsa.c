@@ -2208,21 +2208,6 @@ int mbedtls_rsa_rsassa_pss_sign_ext(mbedtls_rsa_context *ctx,
     return rsa_rsassa_pss_sign(ctx, f_rng, p_rng, md_alg,
                                hashlen, hash, saltlen, sig);
 }
-
-/*
- * Implementation of the PKCS#1 v2.1 RSASSA-PSS-SIGN function
- */
-int mbedtls_rsa_rsassa_pss_sign(mbedtls_rsa_context *ctx,
-                                int (*f_rng)(void *, unsigned char *, size_t),
-                                void *p_rng,
-                                mbedtls_md_type_t md_alg,
-                                unsigned int hashlen,
-                                const unsigned char *hash,
-                                unsigned char *sig)
-{
-    return rsa_rsassa_pss_sign(ctx, f_rng, p_rng, md_alg,
-                               hashlen, hash, MBEDTLS_RSA_SALT_LEN_ANY, sig);
-}
 #endif /* MBEDTLS_PKCS1_V21 */
 
 #if defined(MBEDTLS_PKCS1_V15)
@@ -2455,8 +2440,8 @@ int mbedtls_rsa_pkcs1_sign(mbedtls_rsa_context *ctx,
 
 #if defined(MBEDTLS_PKCS1_V21)
         case MBEDTLS_RSA_PKCS_V21:
-            return mbedtls_rsa_rsassa_pss_sign(ctx, f_rng, p_rng, md_alg,
-                                               hashlen, hash, sig);
+            return mbedtls_rsa_rsassa_pss_sign_ext(ctx, f_rng, p_rng, md_alg,
+                                                   hashlen, hash, MBEDTLS_RSA_SALT_LEN_ANY, sig);
 #endif
 
         default:
@@ -2581,32 +2566,6 @@ int mbedtls_rsa_rsassa_pss_verify_ext(mbedtls_rsa_context *ctx,
 
     return 0;
 }
-
-/*
- * Simplified PKCS#1 v2.1 RSASSA-PSS-VERIFY function
- */
-int mbedtls_rsa_rsassa_pss_verify(mbedtls_rsa_context *ctx,
-                                  mbedtls_md_type_t md_alg,
-                                  unsigned int hashlen,
-                                  const unsigned char *hash,
-                                  const unsigned char *sig)
-{
-    mbedtls_md_type_t mgf1_hash_id;
-    if ((md_alg != MBEDTLS_MD_NONE || hashlen != 0) && hash == NULL) {
-        return MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
-    }
-
-    mgf1_hash_id = (ctx->hash_id != MBEDTLS_MD_NONE)
-                             ? (mbedtls_md_type_t) ctx->hash_id
-                             : md_alg;
-
-    return mbedtls_rsa_rsassa_pss_verify_ext(ctx,
-                                             md_alg, hashlen, hash,
-                                             mgf1_hash_id,
-                                             MBEDTLS_RSA_SALT_LEN_ANY,
-                                             sig);
-
-}
 #endif /* MBEDTLS_PKCS1_V21 */
 
 #if defined(MBEDTLS_PKCS1_V15)
@@ -2690,6 +2649,10 @@ int mbedtls_rsa_pkcs1_verify(mbedtls_rsa_context *ctx,
         return MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
     }
 
+#if defined(MBEDTLS_PKCS1_V21)
+    mbedtls_md_type_t mgf1_hash_id;
+#endif
+
     switch (ctx->padding) {
 #if defined(MBEDTLS_PKCS1_V15)
         case MBEDTLS_RSA_PKCS_V15:
@@ -2699,8 +2662,13 @@ int mbedtls_rsa_pkcs1_verify(mbedtls_rsa_context *ctx,
 
 #if defined(MBEDTLS_PKCS1_V21)
         case MBEDTLS_RSA_PKCS_V21:
-            return mbedtls_rsa_rsassa_pss_verify(ctx, md_alg,
-                                                 hashlen, hash, sig);
+            mgf1_hash_id = (ctx->hash_id != MBEDTLS_MD_NONE)
+                                     ? (mbedtls_md_type_t) ctx->hash_id
+                                     : md_alg;
+            return mbedtls_rsa_rsassa_pss_verify_ext(ctx, md_alg,
+                                                     hashlen, hash, mgf1_hash_id,
+                                                     MBEDTLS_RSA_SALT_LEN_ANY,
+                                                     sig);
 #endif
 
         default:

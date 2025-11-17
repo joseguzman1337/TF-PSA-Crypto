@@ -97,7 +97,7 @@ int mbedtls_rsa_write_pubkey(const mbedtls_rsa_context *rsa, unsigned char *star
 
 #if defined(MBEDTLS_PKCS1_V21)
 /**
- * \brief This function is analogue to \c mbedtls_rsa_rsassa_pss_sign().
+ * \brief This function is analogue to \c mbedtls_rsa_rsassa_pss_sign_ext().
  *        The only difference between them is that this function is more flexible
  *        on the parameters of \p ctx that are set with \c mbedtls_rsa_set_padding().
  *
@@ -106,7 +106,7 @@ int mbedtls_rsa_write_pubkey(const mbedtls_rsa_context *rsa, unsigned char *star
  *        - allows the hash_id of \p ctx to be MBEDTLS_MD_NONE,
  *          in which case it uses \p md_alg as the hash_id.
  *
- * \note  Refer to \c mbedtls_rsa_rsassa_pss_sign() for a description
+ * \note  Refer to \c mbedtls_rsa_rsassa_pss_sign_ext() for a description
  *        of the functioning and parameters of this function.
  */
 int mbedtls_rsa_rsassa_pss_sign_no_mode_check(mbedtls_rsa_context *ctx,

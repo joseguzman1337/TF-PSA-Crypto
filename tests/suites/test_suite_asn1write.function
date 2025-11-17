@@ -254,9 +254,9 @@ exit:
 /* END_CASE */
 
 /* BEGIN_CASE */
-void mbedtls_asn1_write_algorithm_identifier(data_t *oid,
-                                             int par_len,
-                                             data_t *expected)
+void mbedtls_asn1_write_algorithm_identifier_ext(data_t *oid,
+                                                 int par_len,
+                                                 data_t *expected, int has_par)
 {
     generic_write_data_t data = { NULL, NULL, NULL, NULL, 0 };
     int ret;
@@ -268,9 +268,9 @@ void mbedtls_asn1_write_algorithm_identifier(data_t *oid,
         if (!generic_write_start_step(&data)) {
             goto exit;
         }
-        ret = mbedtls_asn1_write_algorithm_identifier(
+        ret = mbedtls_asn1_write_algorithm_identifier_ext(
             &data.p, data.start,
-            (const char *) oid->x, oid->len, par_len);
+            (const char *) oid->x, oid->len, par_len, has_par);
         /* If params_len != 0, mbedtls_asn1_write_algorithm_identifier()
          * assumes that the parameters are already present in the buffer
          * and returns a length that accounts for this, but our test
@@ -280,6 +280,24 @@ void mbedtls_asn1_write_algorithm_identifier(data_t *oid,
         }
         if (!generic_write_finish_step(&data, expected, ret)) {
             goto exit;
+        }
+        if (has_par == 1) {
+            if (!generic_write_start_step(&data)) {
+                goto exit;
+            }
+            ret = mbedtls_asn1_write_algorithm_identifier(
+                &data.p, data.start,
+                (const char *) oid->x, oid->len, par_len);
+            /* If params_len != 0, mbedtls_asn1_write_algorithm_identifier()
+             * assumes that the parameters are already present in the buffer
+             * and returns a length that accounts for this, but our test
+             * data omits the parameters. */
+            if (ret >= 0) {
+                ret -= par_len;
+            }
+            if (!generic_write_finish_step(&data, expected, ret)) {
+                goto exit;
+            }
         }
 
 #if defined(MBEDTLS_ASN1_PARSE_C)
@@ -299,7 +317,10 @@ void mbedtls_asn1_write_algorithm_identifier(data_t *oid,
             TEST_CALLOC(buf_complete, len_complete);
             unsigned char *end_complete = buf_complete + len_complete;
             memcpy(buf_complete, data.p, data_len);
-            if (par_len == 0) {
+            if (has_par == 0) {
+                expected_params_tag = 0;
+                expected_params_len = 0;
+            } else if (par_len == 0) {
                 /* mbedtls_asn1_write_algorithm_identifier() wrote a NULL */
                 expected_params_tag = 0x05;
                 expected_params_len = 0;
