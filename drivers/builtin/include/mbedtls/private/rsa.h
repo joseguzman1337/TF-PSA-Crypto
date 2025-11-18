@@ -184,15 +184,6 @@ int mbedtls_rsa_get_md_alg(const mbedtls_rsa_context *ctx);
  * \note           This function can be called multiple times for successive
  *                 imports, if the parameters are not simultaneously present.
  *
- *                 Any sequence of calls to this function should be followed
- *                 by a call to mbedtls_rsa_complete(), which checks and
- *                 completes the provided information to a ready-for-use
- *                 public or private RSA key.
- *
- * \note           See mbedtls_rsa_complete() for more information on which
- *                 parameters are necessary to set up a private or public
- *                 RSA key.
- *
  * \note           The imported parameters are copied and need not be preserved
  *                 for the lifetime of the RSA context being set up.
  *
@@ -218,15 +209,6 @@ int mbedtls_rsa_import(mbedtls_rsa_context *ctx,
  * \note           This function can be called multiple times for successive
  *                 imports, if the parameters are not simultaneously present.
  *
- *                 Any sequence of calls to this function should be followed
- *                 by a call to mbedtls_rsa_complete(), which checks and
- *                 completes the provided information to a ready-for-use
- *                 public or private RSA key.
- *
- * \note           See mbedtls_rsa_complete() for more information on which
- *                 parameters are necessary to set up a private or public
- *                 RSA key.
- *
  * \note           The imported parameters are copied and need not be preserved
  *                 for the lifetime of the RSA context being set up.
  *
@@ -251,40 +233,6 @@ int mbedtls_rsa_import_raw(mbedtls_rsa_context *ctx,
                            unsigned char const *Q, size_t Q_len,
                            unsigned char const *D, size_t D_len,
                            unsigned char const *E, size_t E_len);
-
-/**
- * \brief          This function completes an RSA context from
- *                 a set of imported core parameters.
- *
- *                 To setup an RSA public key, precisely \c N and \c E
- *                 must have been imported.
- *
- *                 To setup an RSA private key, sufficient information must
- *                 be present for the other parameters to be derivable.
- *
- *                 The default implementation supports the following:
- *                 <ul><li>Derive \c P, \c Q from \c N, \c D, \c E.</li>
- *                 <li>Derive \c N, \c D from \c P, \c Q, \c E.</li></ul>
- *                 Alternative implementations need not support these.
- *
- *                 If this function runs successfully, it guarantees that
- *                 the RSA context can be used for RSA operations without
- *                 the risk of failure or crash.
- *
- * \warning        This function need not perform consistency checks
- *                 for the imported parameters. In particular, parameters that
- *                 are not needed by the implementation might be silently
- *                 discarded and left unchecked. To check the consistency
- *                 of the key material, see mbedtls_rsa_check_privkey().
- *
- * \param ctx      The initialized RSA context holding imported parameters.
- *
- * \return         \c 0 on success.
- * \return         #MBEDTLS_ERR_RSA_BAD_INPUT_DATA if the attempted derivations
- *                 failed.
- *
- */
-int mbedtls_rsa_complete(mbedtls_rsa_context *ctx);
 
 /**
  * \brief          This function exports the core parameters of an RSA key.
@@ -477,24 +425,13 @@ int mbedtls_rsa_check_pubkey(const mbedtls_rsa_context *ctx);
  *
  * \warning    This function should catch accidental misconfigurations
  *             like swapping of parameters, but it cannot establish full
- *             trust in neither the quality nor the consistency of the key
- *             material that was used to setup the given RSA context:
- *             <ul><li>Consistency: Imported parameters that are irrelevant
- *             for the implementation might be silently dropped. If dropped,
- *             the current function does not have access to them,
- *             and therefore cannot check them. See mbedtls_rsa_complete().
- *             If you want to check the consistency of the entire
- *             content of a PKCS1-encoded RSA private key, for example, you
- *             should use mbedtls_rsa_validate_params() before setting
- *             up the RSA context.
- *             Additionally, if the implementation performs empirical checks,
- *             these checks substantiate but do not guarantee consistency.</li>
- *             <li>Quality: This function is not expected to perform
+ *             trust in the quality of the key material that was used to setup
+ *             the given RSA context. This function is not expected to perform
  *             extended quality assessments like checking that the prime
  *             factors are safe. Additionally, it is the responsibility of the
  *             user to ensure the trustworthiness of the source of his RSA
  *             parameters, which goes beyond what is effectively checkable
- *             by the library.</li></ul>
+ *             by the library.
  *
  * \param ctx  The initialized RSA context to check.
  *

@@ -51,12 +51,7 @@
 /*
  * Wrapper around mbedtls_asn1_get_mpi() that rejects zero.
  *
- * The value zero is:
- * - never a valid value for an RSA parameter
- * - interpreted as "omitted, please reconstruct" by mbedtls_rsa_complete().
- *
- * Since values can't be omitted in PKCS#1, passing a zero value to
- * rsa_complete() would be incorrect, so reject zero values early.
+ * The value zero is never a valid value for an RSA parameter.
  */
 static int asn1_get_nonzero_mpi(unsigned char **p,
                                 const unsigned char *end,
@@ -79,7 +74,7 @@ static int asn1_get_nonzero_mpi(unsigned char **p,
 int mbedtls_rsa_parse_key(mbedtls_rsa_context *rsa, const unsigned char *key, size_t keylen)
 {
     int ret, version;
-    size_t len;
+    size_t len, bits;
     unsigned char *p, *end;
 
     mbedtls_mpi T;
@@ -195,17 +190,16 @@ int mbedtls_rsa_parse_key(mbedtls_rsa_context *rsa, const unsigned char *key, si
     }
 #endif
 
-    /* rsa_complete() doesn't complete anything with the default
-     * implementation but is still called:
-     * - for the benefit of alternative implementation that may want to
-     *   pre-compute stuff beyond what's provided (eg Montgomery factors)
-     * - as is also sanity-checks the key
-     *
-     * Furthermore, we also check the public part for consistency with
-     * mbedtls_pk_parse_pubkey(), as it includes size minima for example.
-     */
-    if ((ret = mbedtls_rsa_complete(rsa)) != 0 ||
-        (ret = mbedtls_rsa_check_pubkey(rsa)) != 0) {
+    /* This check here is a duplication of the one in "mbedtls_psa_rsa_load_representation"
+     * in "psa_crypto_rsa.c". The reason for which this is needed here is explained
+     * in issue tf-psa-crypto#562. */
+    bits = PSA_BYTES_TO_BITS(mbedtls_rsa_get_len(rsa));
+    if (bits > PSA_VENDOR_RSA_MAX_KEY_BITS) {
+        ret = PSA_ERROR_NOT_SUPPORTED;
+        goto cleanup;
+    }
+
+    if ((ret = mbedtls_rsa_check_privkey(rsa)) != 0) {
         goto cleanup;
     }
 
@@ -271,8 +265,7 @@ int mbedtls_rsa_parse_pubkey(mbedtls_rsa_context *rsa, const unsigned char *key,
 
     p += len;
 
-    if (mbedtls_rsa_complete(rsa) != 0 ||
-        mbedtls_rsa_check_pubkey(rsa) != 0) {
+    if (mbedtls_rsa_check_pubkey(rsa) != 0) {
         return MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
     }
 
@@ -715,104 +708,6 @@ static int rsa_check_context(mbedtls_rsa_context const *ctx, int is_priv,
 #endif
 
     return 0;
-}
-
-int mbedtls_rsa_complete(mbedtls_rsa_context *ctx)
-{
-    int ret = 0;
-    int have_N, have_P, have_Q, have_D, have_E;
-#if !defined(MBEDTLS_RSA_NO_CRT)
-    int have_DP, have_DQ, have_QP;
-#endif
-    int n_missing, pq_missing, d_missing, is_pub, is_priv;
-
-    have_N = (mbedtls_mpi_cmp_int(&ctx->N, 0) != 0);
-    have_P = (mbedtls_mpi_cmp_int(&ctx->P, 0) != 0);
-    have_Q = (mbedtls_mpi_cmp_int(&ctx->Q, 0) != 0);
-    have_D = (mbedtls_mpi_cmp_int(&ctx->D, 0) != 0);
-    have_E = (mbedtls_mpi_cmp_int(&ctx->E, 0) != 0);
-
-#if !defined(MBEDTLS_RSA_NO_CRT)
-    have_DP = (mbedtls_mpi_cmp_int(&ctx->DP, 0) != 0);
-    have_DQ = (mbedtls_mpi_cmp_int(&ctx->DQ, 0) != 0);
-    have_QP = (mbedtls_mpi_cmp_int(&ctx->QP, 0) != 0);
-#endif
-
-    /*
-     * Check whether provided parameters are enough
-     * to deduce all others. The following incomplete
-     * parameter sets for private keys are supported:
-     *
-     * (1) P, Q missing.
-     * (2) D and potentially N missing.
-     *
-     */
-
-    n_missing  =              have_P &&  have_Q &&  have_D && have_E;
-    pq_missing =   have_N && !have_P && !have_Q &&  have_D && have_E;
-    d_missing  =              have_P &&  have_Q && !have_D && have_E;
-    is_pub     =   have_N && !have_P && !have_Q && !have_D && have_E;
-
-    /* These three alternatives are mutually exclusive */
-    is_priv = n_missing || pq_missing || d_missing;
-
-    if (!is_priv && !is_pub) {
-        return MBEDTLS_ERR_RSA_BAD_INPUT_DATA;
-    }
-
-    /*
-     * Step 1: Deduce N if P, Q are provided.
-     */
-
-    if (!have_N && have_P && have_Q) {
-        if ((ret = mbedtls_mpi_mul_mpi(&ctx->N, &ctx->P,
-                                       &ctx->Q)) != 0) {
-            return MBEDTLS_ERROR_ADD(MBEDTLS_ERR_RSA_BAD_INPUT_DATA, ret);
-        }
-
-        ctx->len = mbedtls_mpi_size(&ctx->N);
-    }
-
-    /*
-     * Step 2: Deduce and verify all remaining core parameters.
-     */
-
-    if (pq_missing) {
-        ret = mbedtls_rsa_deduce_primes(&ctx->N, &ctx->E, &ctx->D,
-                                        &ctx->P, &ctx->Q);
-        if (ret != 0) {
-            return MBEDTLS_ERROR_ADD(MBEDTLS_ERR_RSA_BAD_INPUT_DATA, ret);
-        }
-
-    } else if (d_missing) {
-        if ((ret = mbedtls_rsa_deduce_private_exponent(&ctx->P,
-                                                       &ctx->Q,
-                                                       &ctx->E,
-                                                       &ctx->D)) != 0) {
-            return MBEDTLS_ERROR_ADD(MBEDTLS_ERR_RSA_BAD_INPUT_DATA, ret);
-        }
-    }
-
-    /*
-     * Step 3: Deduce all additional parameters specific
-     *         to our current RSA implementation.
-     */
-
-#if !defined(MBEDTLS_RSA_NO_CRT)
-    if (is_priv && !(have_DP && have_DQ && have_QP)) {
-        ret = mbedtls_rsa_deduce_crt(&ctx->P,  &ctx->Q,  &ctx->D,
-                                     &ctx->DP, &ctx->DQ, &ctx->QP);
-        if (ret != 0) {
-            return MBEDTLS_ERROR_ADD(MBEDTLS_ERR_RSA_BAD_INPUT_DATA, ret);
-        }
-    }
-#endif /* MBEDTLS_RSA_NO_CRT */
-
-    /*
-     * Step 3: Basic sanity checks
-     */
-
-    return rsa_check_context(ctx, is_priv, 1);
 }
 
 int mbedtls_rsa_export_raw(const mbedtls_rsa_context *ctx,
@@ -2842,7 +2737,9 @@ int mbedtls_rsa_self_test(int verbose)
     MBEDTLS_MPI_CHK(mbedtls_mpi_read_string(&K, 16, RSA_E));
     MBEDTLS_MPI_CHK(mbedtls_rsa_import(&rsa, NULL, NULL, NULL, NULL, &K));
 
-    MBEDTLS_MPI_CHK(mbedtls_rsa_complete(&rsa));
+#if !defined(MBEDTLS_RSA_NO_CRT)
+    MBEDTLS_MPI_CHK(mbedtls_rsa_deduce_crt(&rsa.P, &rsa.Q, &rsa.D, &rsa.DP, &rsa.DQ, &rsa.QP));
+#endif /* !MBEDTLS_RSA_NO_CRT */
 
     if (verbose != 0) {
         mbedtls_printf("  RSA key validation: ");
