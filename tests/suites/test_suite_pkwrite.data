@@ -153,3 +153,19 @@ pk_write_public_from_private:"../framework/data_files/ec_x25519_prv.der":"../fra
 Derive public key EC X448
 depends_on:PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY:PSA_WANT_ECC_MONTGOMERY_448
 pk_write_public_from_private:"../framework/data_files/ec_x448_prv.der":"../framework/data_files/ec_x448_pub.der"
+
+Export public key PSA - EC key secp256r1
+depends_on:PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY:PSA_WANT_ECC_SECP_R1_256
+pk_write_pubkey_psa:"../framework/data_files/ec_256_pub.der"
+
+Export public key PSA - EC key secp521r1
+depends_on:PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY:PSA_WANT_ECC_SECP_R1_521
+pk_write_pubkey_psa:"../framework/data_files/ec_521_pub.der"
+
+Export public key PSA - RSA 1024 bits
+depends_on:PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY
+pk_write_pubkey_psa:"../framework/data_files/server1.pubkey.der"
+
+Export public key PSA - RSA 4096 bits
+depends_on:PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY:MBEDTLS_TEST_PK_ALLOW_RSA_KEY_PAIR_4096
+pk_write_pubkey_psa:"../framework/data_files/rsa4096_pub.der"

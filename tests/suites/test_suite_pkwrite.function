@@ -233,3 +233,66 @@ exit:
     USE_PSA_DONE();
 }
 /* END_CASE */
+
+/* BEGIN_CASE */
+void pk_write_pubkey_psa(char *key_file)
+{
+    mbedtls_pk_context pk;
+    uint8_t buf[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE + 1];
+    size_t buf_len, cur_size, safe_export_size;
+    int expected_ret;
+    int is_ec;
+
+    mbedtls_pk_init(&pk);
+
+    /* Test basic checks on input parameters */
+    TEST_EQUAL(mbedtls_pk_write_pubkey_psa(NULL, buf, sizeof(buf), &buf_len),
+               MBEDTLS_ERR_PK_BAD_INPUT_DATA);
+    TEST_EQUAL(mbedtls_pk_write_pubkey_psa(&pk, NULL, sizeof(buf), &buf_len),
+               MBEDTLS_ERR_PK_BAD_INPUT_DATA);
+    TEST_EQUAL(mbedtls_pk_write_pubkey_psa(&pk, buf, sizeof(buf), NULL),
+               MBEDTLS_ERR_PK_BAD_INPUT_DATA);
+    TEST_EQUAL(mbedtls_pk_write_pubkey_psa(&pk, buf, sizeof(buf), &buf_len),
+               MBEDTLS_ERR_PK_BAD_INPUT_DATA);
+
+    USE_PSA_INIT();
+    TEST_EQUAL(mbedtls_pk_parse_public_keyfile(&pk, key_file), 0);
+
+    /* TODO: Replace this with mbedtls_pk_get_type() once it will be available */
+#if defined(PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY)
+    is_ec = (pk.ec_family != 0);
+#else
+    is_ec = 0;
+#endif
+
+    /* Compute the minimum buffer size that allows the export to be successful for
+     * the given key. */
+    if (is_ec) {
+        safe_export_size = PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(mbedtls_pk_get_bitlen(&pk));
+    } else {
+        safe_export_size = PSA_KEY_EXPORT_RSA_PUBLIC_KEY_MAX_SIZE(mbedtls_pk_get_bitlen(&pk));
+    }
+
+    for (cur_size = 0; cur_size < sizeof(buf); cur_size++) {
+        if (cur_size >= safe_export_size) {
+            /* If the buffer size is at least the safe length, then export must succeed. */
+            expected_ret = 0;
+        } else if (cur_size >= pk.pub_raw_len) {
+            /* If it's less than the safe length it might still succeed, but it depends
+             * on the real length of the data stored in the PK context. */
+            expected_ret = 0;
+        } else {
+            expected_ret = MBEDTLS_ERR_PK_BUFFER_TOO_SMALL;
+        }
+
+        TEST_EQUAL(mbedtls_pk_write_pubkey_psa(&pk, buf, cur_size, &buf_len), expected_ret);
+        if (expected_ret == 0) {
+            TEST_EQUAL(buf_len, pk.pub_raw_len);
+        }
+    }
+
+exit:
+    mbedtls_pk_free(&pk);
+    USE_PSA_DONE();
+}
+/* END_CASE */
