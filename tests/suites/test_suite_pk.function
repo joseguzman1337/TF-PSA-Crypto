@@ -2182,7 +2182,7 @@ void pk_get_key_type_wrap_psa(int key_type_arg, int bits)
      * so set its usage and alg flags to disallow everything. */
     pk_psa_setup(key_type, bits, (psa_key_usage_t) 0,
                  PSA_ALG_NONE, PSA_ALG_NONE,
-                 PSA_KEY_ID_NULL, &key);
+                 MBEDTLS_SVC_KEY_ID_INIT, &key);
 
     /* 2. Wrap PSA key in PK context */
     TEST_EQUAL(mbedtls_pk_wrap_psa(&ctx, key), 0);
@@ -2261,7 +2261,7 @@ void pk_get_key_type_copy_from_psa_keypair(int key_type_arg, int bits)
      * exportable. */
     pk_psa_setup(key_type, bits, PSA_KEY_USAGE_EXPORT,
                  PSA_ALG_NONE, PSA_ALG_NONE,
-                 PSA_KEY_ID_NULL, &key);
+                 MBEDTLS_SVC_KEY_ID_INIT, &key);
 
     /* 2. Copy PSA key into a PK context */
     TEST_EQUAL(mbedtls_pk_copy_from_psa(key, &ctx), 0);
@@ -2308,7 +2308,7 @@ void pk_get_key_type_copy_from_psa_public(int key_type_arg, int bits)
      * exportable. */
     pk_psa_setup(keypair_type, bits, PSA_KEY_USAGE_EXPORT,
                  PSA_ALG_NONE, PSA_ALG_NONE,
-                 PSA_KEY_ID_NULL, &keypair);
+                 MBEDTLS_SVC_KEY_ID_INIT, &keypair);
 
     /* 2. Export the public key into a buffer */
     exported_size = PSA_EXPORT_KEY_OUTPUT_SIZE(key_type, bits);
@@ -2370,7 +2370,7 @@ void pk_get_key_type_copy_public_from_psa(int key_type_arg, int bits)
      * exportable. */
     pk_psa_setup(keypair_type, bits, PSA_KEY_USAGE_EXPORT,
                  PSA_ALG_NONE, PSA_ALG_NONE,
-                 PSA_KEY_ID_NULL, &keypair);
+                 MBEDTLS_SVC_KEY_ID_INIT, &keypair);
 
     /* 2. Copy public key into a PK context */
     TEST_EQUAL(mbedtls_pk_copy_public_from_psa(keypair, &ctx), 0);
