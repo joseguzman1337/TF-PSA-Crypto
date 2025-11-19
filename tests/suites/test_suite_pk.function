@@ -2169,7 +2169,6 @@ exit:
 void pk_get_key_type_wrap_psa(int key_type_arg, int bits)
 {
     mbedtls_svc_key_id_t key = MBEDTLS_SVC_KEY_ID_INIT;
-    psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
     psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t returned_key_type;
@@ -2178,16 +2177,12 @@ void pk_get_key_type_wrap_psa(int key_type_arg, int bits)
 
     PSA_INIT();
 
-    /* 1. Generate a PSA key */
-    attrs = psa_key_attributes_init();
-    psa_set_key_type(&attrs, key_type);
-    psa_set_key_bits(&attrs, (size_t) bits);
+    /* 1. Get a PSA key */
     /* We don't need to use the key for anything, just get its type,
-     * so set its flags to disallow everything. */
-    psa_set_key_usage_flags(&attrs, 0);
-    psa_set_key_algorithm(&attrs, PSA_ALG_NONE);
-
-    PSA_ASSERT(psa_generate_key(&attrs, &key));
+     * so set its usage and alg flags to disallow everything. */
+    pk_psa_setup(key_type, bits, (psa_key_usage_t) 0,
+                 PSA_ALG_NONE, PSA_ALG_NONE,
+                 PSA_KEY_ID_NULL, &key);
 
     /* 2. Wrap PSA key in PK context */
     TEST_EQUAL(mbedtls_pk_wrap_psa(&ctx, key), 0);
@@ -2253,7 +2248,6 @@ exit:
 void pk_get_key_type_copy_from_psa_keypair(int key_type_arg, int bits)
 {
     mbedtls_svc_key_id_t key = MBEDTLS_SVC_KEY_ID_INIT;
-    psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
     psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t returned_key_type;
@@ -2262,16 +2256,12 @@ void pk_get_key_type_copy_from_psa_keypair(int key_type_arg, int bits)
 
     PSA_INIT();
 
-    /* 1. Generate a PSA key */
-    attrs = psa_key_attributes_init();
-    psa_set_key_type(&attrs, key_type);
-    psa_set_key_bits(&attrs, (size_t) bits);
+    /* 1. Get a PSA key */
     /* We don't need to use the key for anything but it needs to be
      * exportable. */
-    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_EXPORT);
-    psa_set_key_algorithm(&attrs, PSA_ALG_NONE);
-
-    PSA_ASSERT(psa_generate_key(&attrs, &key));
+    pk_psa_setup(key_type, bits, PSA_KEY_USAGE_EXPORT,
+                 PSA_ALG_NONE, PSA_ALG_NONE,
+                 PSA_KEY_ID_NULL, &key);
 
     /* 2. Copy PSA key into a PK context */
     TEST_EQUAL(mbedtls_pk_copy_from_psa(key, &ctx), 0);
@@ -2310,19 +2300,15 @@ void pk_get_key_type_copy_from_psa_public(int key_type_arg, int bits)
 
     TEST_ASSERT(PSA_KEY_TYPE_IS_PUBLIC_KEY(key_type));
 
-    /* 1. Generate a PSA key pair */
+    /* 1. Get a PSA key pair */
     keypair_type = (key_type & ~PSA_KEY_TYPE_CATEGORY_MASK)
                    | PSA_KEY_TYPE_CATEGORY_KEY_PAIR;
 
-    attrs = psa_key_attributes_init();
-    psa_set_key_type(&attrs, keypair_type);
-    psa_set_key_bits(&attrs, (size_t) bits);
     /* We don't need to use the key for anything but it needs to be
      * exportable. */
-    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_EXPORT);
-    psa_set_key_algorithm(&attrs, PSA_ALG_NONE);
-
-    PSA_ASSERT(psa_generate_key(&attrs, &keypair));
+    pk_psa_setup(keypair_type, bits, PSA_KEY_USAGE_EXPORT,
+                 PSA_ALG_NONE, PSA_ALG_NONE,
+                 PSA_KEY_ID_NULL, &keypair);
 
     /* 2. Export the public key into a buffer */
     exported_size = PSA_EXPORT_KEY_OUTPUT_SIZE(key_type, bits);
@@ -2333,7 +2319,14 @@ void pk_get_key_type_copy_from_psa_public(int key_type_arg, int bits)
                                      &exported_length));
 
     /* 3. Reimport public key into PSA */
+    attrs = psa_key_attributes_init();
     psa_set_key_type(&attrs, key_type);
+    psa_set_key_bits(&attrs, (size_t) bits);
+    /* We don't need to use the key for anything but it needs to be
+     * exportable. */
+    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_EXPORT);
+    psa_set_key_algorithm(&attrs, PSA_ALG_NONE);
+
     PSA_ASSERT(psa_import_key(&attrs, exported, exported_length, &public_key));
 
     /* 4. Copy public PSA key into a PK context */
@@ -2358,7 +2351,6 @@ exit:
 void pk_get_key_type_copy_public_from_psa(int key_type_arg, int bits)
 {
     mbedtls_svc_key_id_t keypair = MBEDTLS_SVC_KEY_ID_INIT;
-    psa_key_attributes_t attrs;
     mbedtls_pk_context ctx;
     psa_key_type_t key_type = (psa_key_type_t) key_type_arg;
     psa_key_type_t keypair_type;
@@ -2370,19 +2362,15 @@ void pk_get_key_type_copy_public_from_psa(int key_type_arg, int bits)
 
     TEST_ASSERT(PSA_KEY_TYPE_IS_PUBLIC_KEY(key_type));
 
-    /* 1. Generate a PSA key pair */
+    /* 1. Get a PSA key pair */
     keypair_type = (key_type & ~PSA_KEY_TYPE_CATEGORY_MASK)
                    | PSA_KEY_TYPE_CATEGORY_KEY_PAIR;
 
-    attrs = psa_key_attributes_init();
-    psa_set_key_type(&attrs, keypair_type);
-    psa_set_key_bits(&attrs, (size_t) bits);
     /* We don't need to use the key for anything but it needs to be
      * exportable. */
-    psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_EXPORT);
-    psa_set_key_algorithm(&attrs, PSA_ALG_NONE);
-
-    PSA_ASSERT(psa_generate_key(&attrs, &keypair));
+    pk_psa_setup(keypair_type, bits, PSA_KEY_USAGE_EXPORT,
+                 PSA_ALG_NONE, PSA_ALG_NONE,
+                 PSA_KEY_ID_NULL, &keypair);
 
     /* 2. Copy public key into a PK context */
     TEST_EQUAL(mbedtls_pk_copy_public_from_psa(keypair, &ctx), 0);
