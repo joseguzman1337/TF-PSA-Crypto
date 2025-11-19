@@ -879,6 +879,39 @@ int mbedtls_pk_write_pubkey_pem(const mbedtls_pk_context *ctx, unsigned char *bu
  */
 int mbedtls_pk_write_key_pem(const mbedtls_pk_context *ctx, unsigned char *buf, size_t size);
 #endif /* MBEDTLS_PEM_WRITE_C */
+
+/**
+ * \brief       Write the public key of the provided PK context in "PSA friendly"
+ *              format.
+ *
+ * \note        "PSA friendly" format means that the obtained output buffer can
+ *              be directly imported into PSA using psa_import_key() without
+ *              any modification.
+ *
+ * \param ctx       PK context from which the public key is extracted. It must
+ *                  have been populated.
+ * \param buf       Output buffer where the pubblic key is written. It must not
+ *                  be NULL.
+ * \param buf_size  Size of \p buf buffer in bytes.
+ *                  #PSA_EXPORT_PUBLIC_KEY_MAX_SIZE can be used as safe value
+ *                  that fit all the key types enabled in the build of the
+ *                  PSA Crypto Core.
+ *                  Otherwise the following more accurate values can be used:
+ *                  - #PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(bitlen) for EC keys,
+ *                  - #PSA_KEY_EXPORT_RSA_PUBLIC_KEY_MAX_SIZE(bitlen) for RSA keys,
+ *                  where the 'bitlen' parameter can be obtained through
+ *                  #mbedtls_pk_get_bitlen() on the same PK context.
+ * \param buf_len   Amount of bytes written into \p buf if the exporting
+ *                  operation is successful. In case of failure the value is 0.
+ *
+ * \return          0 if successful.
+ * \return          MBEDTLS_ERR_PK_BAD_INPUT_DATA if \p ctx, \p buf or \p buf_len
+ *                  pointers are \c NULL.
+ * \return          MBEDTLS_ERR_PK_BUFFER_TOO_SMALL if the provided output buffer
+ *                  is too small to contain the public key.
+ */
+int mbedtls_pk_write_pubkey_psa(const mbedtls_pk_context *ctx, unsigned char *buf,
+                                size_t buf_size, size_t *buf_len);
 #endif /* MBEDTLS_PK_WRITE_C */
 
 #ifdef __cplusplus

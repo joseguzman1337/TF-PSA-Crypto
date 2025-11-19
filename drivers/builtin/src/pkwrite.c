@@ -476,6 +476,26 @@ int mbedtls_pk_write_key_der(const mbedtls_pk_context *key, unsigned char *buf, 
 }
 
 /******************************************************************************
+ * Public functions for public keys in "PSA friendly" format.
+ ******************************************************************************/
+int mbedtls_pk_write_pubkey_psa(const mbedtls_pk_context *ctx, unsigned char *buf,
+                                size_t buf_size, size_t *buf_len)
+{
+    if ((ctx == NULL) || (buf == NULL) || (buf_len == NULL) || (ctx->pub_raw_len == 0)) {
+        return MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+    }
+
+    if (buf_size < ctx->pub_raw_len) {
+        return MBEDTLS_ERR_PK_BUFFER_TOO_SMALL;
+    }
+
+    memcpy(buf, ctx->pub_raw, ctx->pub_raw_len);
+    *buf_len = ctx->pub_raw_len;
+
+    return 0;
+}
+
+/******************************************************************************
  * Public functions for wrinting private/public PEM keys.
  ******************************************************************************/
 #if defined(MBEDTLS_PEM_WRITE_C)
