@@ -413,7 +413,7 @@ int mbedtls_pk_get_psa_attributes(const mbedtls_pk_context *pk,
  * \brief           Get the PSA key type corresponding to the key represented
  *                  by the given PK context.
  *
- * \param pk        The context to query.
+ * \param pk        The context to query. It must already be initialized.
  *
  * \return          A PSA key type. Specifically, one of:
  *                      - PSA_KEY_TYPE_RSA_KEY_PAIR
