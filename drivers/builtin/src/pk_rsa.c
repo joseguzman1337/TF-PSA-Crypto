@@ -19,6 +19,7 @@ int mbedtls_pk_rsa_set_key(mbedtls_pk_context *pk, const unsigned char *key, siz
     psa_status_t status;
     size_t key_bits = 0;
 
+    pk->psa_type = PSA_KEY_TYPE_RSA_KEY_PAIR;
     psa_set_key_type(&attr, PSA_KEY_TYPE_RSA_KEY_PAIR);
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_SIGN_HASH | PSA_KEY_USAGE_SIGN_MESSAGE |
                             PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_VERIFY_MESSAGE |

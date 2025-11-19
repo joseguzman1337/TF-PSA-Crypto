@@ -41,6 +41,7 @@ int mbedtls_pk_ecc_set_key(mbedtls_pk_context *pk, unsigned char *key, size_t ke
     psa_key_usage_t flags;
     psa_status_t status;
 
+    pk->psa_type = PSA_KEY_TYPE_ECC_KEY_PAIR(pk->ec_family);
     psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(pk->ec_family));
     if (pk->ec_family == PSA_ECC_FAMILY_MONTGOMERY) {
         /* Do not set algorithm here because Montgomery keys cannot do ECDSA and

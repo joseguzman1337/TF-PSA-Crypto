@@ -927,22 +927,6 @@ MBEDTLS_STATIC_TESTABLE int mbedtls_pk_parse_key_pkcs8_encrypted_der(
  *
  **********************************************************************/
 
-/* Get the key type from pk->priv_id and copy it to pk->psa_type. */
-static int mbedtls_pk_set_psa_type_from_private(mbedtls_pk_context *pk)
-{
-    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
-    psa_status_t status;
-
-    status = psa_get_key_attributes(pk->priv_id, &attributes);
-    if (status != PSA_SUCCESS) {
-        return status;
-    }
-
-    pk->psa_type = psa_get_key_type(&attributes);
-
-    return 0;
-}
-
 /*
  * Parse a private key
  */
@@ -977,8 +961,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
     if (ret == 0) {
         pk_info = mbedtls_pk_info_from_type(MBEDTLS_PK_RSA);
         if ((ret = mbedtls_pk_setup(pk, pk_info)) != 0 ||
-            (ret = mbedtls_pk_rsa_set_key(pk, pem.buf, pem.buflen)) != 0 ||
-            (ret = mbedtls_pk_set_psa_type_from_private(pk)) != 0) {
+            (ret = mbedtls_pk_rsa_set_key(pk, pem.buf, pem.buflen)) != 0) {
             mbedtls_pk_free(pk);
         }
 
@@ -1008,8 +991,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
 
         if ((ret = mbedtls_pk_setup(pk, pk_info)) != 0 ||
             (ret = pk_parse_key_sec1_der(pk,
-                                         pem.buf, pem.buflen)) != 0 ||
-            (ret = mbedtls_pk_set_psa_type_from_private(pk)) != 0) {
+                                         pem.buf, pem.buflen)) != 0) {
             mbedtls_pk_free(pk);
         }
 
@@ -1035,8 +1017,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
     if (ret == 0) {
         if ((ret = mbedtls_pk_parse_key_pkcs8_unencrypted_der(pk,
                                                               pem.buf,
-                                                              pem.buflen)) != 0 ||
-            (ret = mbedtls_pk_set_psa_type_from_private(pk)) != 0) {
+                                                              pem.buflen)) != 0) {
             mbedtls_pk_free(pk);
         }
 
@@ -1058,8 +1039,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
     }
     if (ret == 0) {
         if ((ret = mbedtls_pk_parse_key_pkcs8_encrypted_der(pk, pem.buf, pem.buflen,
-                                                            pwd, pwdlen)) != 0 ||
-            (ret = mbedtls_pk_set_psa_type_from_private(pk)) != 0) {
+                                                            pwd, pwdlen)) != 0) {
             mbedtls_pk_free(pk);
         }
 
@@ -1097,8 +1077,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
         mbedtls_zeroize_and_free(key_copy, keylen);
     }
 
-    if ((ret == 0) &&
-        (ret = mbedtls_pk_set_psa_type_from_private(pk)) == 0) {
+    if (ret == 0) {
         return 0;
     }
 
@@ -1111,8 +1090,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
 #endif /* MBEDTLS_PKCS5_C */
 
     ret = mbedtls_pk_parse_key_pkcs8_unencrypted_der(pk, key, keylen);
-    if ((ret == 0) &&
-        (ret = mbedtls_pk_set_psa_type_from_private(pk)) == 0) {
+    if (ret == 0) {
         return 0;
     }
 
@@ -1123,8 +1101,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
 
     pk_info = mbedtls_pk_info_from_type(MBEDTLS_PK_RSA);
     if (mbedtls_pk_setup(pk, pk_info) == 0 &&
-        mbedtls_pk_rsa_set_key(pk, key, keylen) == 0 &&
-        mbedtls_pk_set_psa_type_from_private(pk) == 0) {
+        mbedtls_pk_rsa_set_key(pk, key, keylen) == 0) {
         return 0;
     }
 
@@ -1136,8 +1113,7 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
     pk_info = mbedtls_pk_info_from_type(MBEDTLS_PK_ECKEY);
     if (mbedtls_pk_setup(pk, pk_info) == 0 &&
         pk_parse_key_sec1_der(pk,
-                              key, keylen) == 0 &&
-        mbedtls_pk_set_psa_type_from_private(pk) == 0) {
+                              key, keylen) == 0) {
         return 0;
     }
     mbedtls_pk_free(pk);
