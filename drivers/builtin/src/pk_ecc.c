@@ -130,7 +130,8 @@ exit:
 #endif /* MBEDTLS_PK_PARSE_EC_COMPRESSED */
 }
 
-int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, size_t pub_len)
+int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, size_t pub_len,
+                              int is_keypair)
 {
     /* Load the key */
     if (!PSA_ECC_FAMILY_IS_WEIERSTRASS(pk->ec_family) || *pub == 0x04) {
@@ -164,7 +165,11 @@ int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, 
         return MBEDTLS_ERR_PK_INVALID_PUBKEY;
     }
 
-    pk->psa_type = PSA_KEY_TYPE_ECC_PUBLIC_KEY(pk->ec_family);
+    /* If we are populating the public part of an existing key pair, do not
+     * update the PSA key type. */
+    if (!is_keypair) {
+        pk->psa_type = PSA_KEY_TYPE_ECC_PUBLIC_KEY(pk->ec_family);
+    }
 
     return 0;
 }

@@ -970,7 +970,7 @@ static int copy_from_psa(mbedtls_svc_key_id_t key_id,
             }
             ret = mbedtls_pk_ecc_set_pubkey_from_prv(pk, exp_key, exp_key_len);
         } else {
-            ret = mbedtls_pk_ecc_set_pubkey(pk, exp_key, exp_key_len);
+            ret = mbedtls_pk_ecc_set_pubkey(pk, exp_key, exp_key_len, 0);
         }
         if (ret != 0) {
             goto exit;
