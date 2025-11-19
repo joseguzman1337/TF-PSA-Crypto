@@ -9975,9 +9975,14 @@ void key_agreement_interruptible(int alg_arg,
     TEST_EQUAL(num_ops_prior, MBEDTLS_ECP_OPS_CHK);
 
     min_num_ops = interruptible_operations_get_min_num_ops(key_bits);
+    uint32_t exp_max_ops = max_ops <= min_num_ops ? min_num_ops : max_ops;
 
+    psa_ecc_family_t fam = PSA_KEY_TYPE_ECC_GET_FAMILY(our_key_type);
+    int interruptible = PSA_ECC_FAMILY_IS_WEIERSTRASS(fam);
+
+    size_t nb_calls = 0;
     do {
-
+        nb_calls++;
         status = psa_key_agreement_iop_complete(&operation, &output_key);
 
         if (status == PSA_SUCCESS || status == PSA_OPERATION_INCOMPLETE) {
@@ -9986,10 +9991,10 @@ void key_agreement_interruptible(int alg_arg,
                number of operations was less than the minium possible for
                the curve size. */
             num_ops = psa_key_agreement_iop_get_num_ops(&operation);
-            if (max_ops <= min_num_ops) {
-                TEST_LE_U(num_ops - num_ops_prior, min_num_ops);
-            } else {
-                TEST_LE_U(num_ops - num_ops_prior, max_ops);
+            uint32_t new_ops = num_ops - num_ops_prior;
+            if (interruptible) {
+                TEST_LE_U(2, new_ops);
+                TEST_LE_U(new_ops, exp_max_ops);
             }
 
             num_ops_prior = num_ops;
@@ -10003,6 +10008,16 @@ void key_agreement_interruptible(int alg_arg,
     } while (status == PSA_OPERATION_INCOMPLETE);
 
     TEST_EQUAL(status, PSA_SUCCESS);
+
+    if (interruptible) {
+        /* Somewhat arbitrary limit, but we know no curve can complete in less
+         * than that number of operations, so at least two calls */
+        if (max_ops <= 1000) {
+            TEST_LE_U(2, nb_calls);
+        }
+    } else {
+        TEST_EQUAL(1, nb_calls);
+    }
 
     /* Test that calling complete after a successful complete fails. */
     TEST_EQUAL(psa_key_agreement_iop_complete(&operation, &output_key),
