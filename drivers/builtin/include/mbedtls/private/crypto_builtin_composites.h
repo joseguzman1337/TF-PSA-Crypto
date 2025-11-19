@@ -236,7 +236,9 @@ typedef struct {
 /* Context structure for the Mbed TLS interruptible key agreement implementation. */
 typedef struct {
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_ECDH) && defined(MBEDTLS_ECP_RESTARTABLE)
-    mbedtls_ecdh_context MBEDTLS_PRIVATE(ctx);
+    mbedtls_ecp_keypair *MBEDTLS_PRIVATE(our_key);
+    mbedtls_ecp_keypair *MBEDTLS_PRIVATE(their_key);
+    mbedtls_ecp_restart_ctx MBEDTLS_PRIVATE(rs);
     uint32_t MBEDTLS_PRIVATE(num_ops);
 #else
     /* Make the struct non-empty if algs not supported. */
@@ -245,7 +247,7 @@ typedef struct {
 } mbedtls_psa_key_agreement_interruptible_operation_t;
 
 #if defined(MBEDTLS_PSA_BUILTIN_ALG_ECDH) && defined(MBEDTLS_ECP_RESTARTABLE)
-#define MBEDTLS_PSA_KEY_AGREEMENT_IOP_INIT { MBEDTLS_ECDH_CONTEXT_INIT, 0 }
+#define MBEDTLS_PSA_KEY_AGREEMENT_IOP_INIT { NULL, NULL, MBEDTLS_ECP_RESTART_INIT, 0 }
 #else
 #define MBEDTLS_PSA_KEY_AGREEMENT_IOP_INIT { 0 }
 #endif
