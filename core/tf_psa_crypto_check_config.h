@@ -20,12 +20,6 @@
 
 /* *INDENT-OFF* */
 
-#if !defined(TF_PSA_CRYPTO_CONFIG_IS_FINALIZED)
-#warning "Do not include mbedtls/check_config.h manually! " \
-         "This may cause spurious errors. " \
-         "It is included automatically at the right point since Mbed TLS 3.0."
-#endif /* !TF_PSA_CRYPTO_CONFIG_IS_FINALIZED */
-
 /*
  * We assume CHAR_BIT is 8 in many places. In practice, this is true on our
  * target platforms, so not an issue, but let's just be extra sure.
@@ -42,7 +36,7 @@
 #error "MBEDTLS_PLATFORM_C is required on Windows"
 #endif
 /* See auto-enabling SNPRINTF_ALT and VSNPRINTF_ALT
- * in * config_adjust_legacy_crypto.h */
+ * in <tf-psa-crypto/private/crypto_adjust_config_support.h> */
 #endif /* _MINGW32__ || (_MSC_VER && (_MSC_VER <= 1900)) */
 
 #if defined(MBEDTLS_DEPRECATED_WARNING) && \

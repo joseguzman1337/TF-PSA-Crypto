@@ -1,5 +1,5 @@
 /**
- * \file psa/crypto_adjust_config_derived.h
+ * \file tf-psa-crypto/private/crypto_adjust_config_derived.h
  * \brief Adjust PSA configuration by defining internal symbols
  *
  * This is an internal header. Do not include it directly.
@@ -9,16 +9,8 @@
  *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
-#ifndef PSA_CRYPTO_ADJUST_CONFIG_DERIVED_H
-#define PSA_CRYPTO_ADJUST_CONFIG_DERIVED_H
-
-#if !defined(TF_PSA_CRYPTO_CONFIG_FILES_READ)
-#error "Do not include psa/crypto_adjust_*.h manually! This can lead to problems, " \
-    "up to and including runtime errors such as buffer overflows. " \
-    "If you're trying to fix a complaint from check_config.h, just remove " \
-    "it from your configuration file: since Mbed TLS 3.0, it is included " \
-    "automatically at the right point."
-#endif /* */
+#ifndef TF_PSA_CRYPTO_PRIVATE_CRYPTO_ADJUST_CONFIG_DERIVED_H
+#define TF_PSA_CRYPTO_PRIVATE_CRYPTO_ADJUST_CONFIG_DERIVED_H
 
 /* The number of "true" entropy sources (excluding NV seed).
  * This must be consistent with mbedtls_entropy_init() in entropy.c.
@@ -75,7 +67,7 @@
  * If the RNG strength is not explicitly defined in the configuration, define
  * it here to its default value. This ensures it is available for use in
  * adjusting the configuration of RNG internal modules in
- * config_adjust_legacy_crypto.h.
+ * crypto_adjust_config_support.h.
  */
 #if !defined(MBEDTLS_PSA_CRYPTO_RNG_STRENGTH)
 #define MBEDTLS_PSA_CRYPTO_RNG_STRENGTH 256
@@ -98,4 +90,10 @@
 
 #endif /* !MBEDTLS_PSA_CRYPTO_RNG_HASH */
 
-#endif /* PSA_CRYPTO_ADJUST_CONFIG_DERIVED_H */
+/* A macro used by Mbed TLS. */
+#if defined(PSA_WANT_ALG_GCM) || defined(PSA_WANT_ALG_CCM) || \
+    defined(PSA_WANT_ALG_CHACHA20_POLY1305)
+#define MBEDTLS_SSL_HAVE_AEAD
+#endif
+
+#endif /* TF_PSA_CRYPTO_PRIVATE_CRYPTO_ADJUST_CONFIG_DERIVED_H */
