@@ -3768,7 +3768,12 @@ psa_status_t psa_verify_hash_abort(
 void mbedtls_psa_interruptible_set_max_ops(uint32_t max_ops)
 {
 
-#if (defined(MBEDTLS_PSA_BUILTIN_ALG_ECDSA) || \
+#if (defined(MBEDTLS_PSA_BUILTIN_ALG_ECDH) || \
+    defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_ECC_KEY_PAIR_GENERATE) || \
+    defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_ECC_KEY_PAIR_IMPORT) || \
+    defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_ECC_KEY_PAIR_EXPORT) || \
+    defined(MBEDTLS_PSA_BUILTIN_KEY_TYPE_ECC_PUBLIC_KEY) || \
+    defined(MBEDTLS_PSA_BUILTIN_ALG_ECDSA) || \
     defined(MBEDTLS_PSA_BUILTIN_ALG_DETERMINISTIC_ECDSA)) && \
     defined(MBEDTLS_ECP_RESTARTABLE)
 
