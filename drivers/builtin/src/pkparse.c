@@ -569,7 +569,7 @@ int mbedtls_pk_parse_subpubkey(unsigned char **p, const unsigned char *end,
             ret = pk_use_ecparams(&alg_params, pk);
         }
         if (ret == 0) {
-            ret = mbedtls_pk_ecc_set_pubkey(pk, *p, (size_t) (end - *p), 0);
+            ret = mbedtls_pk_ecc_set_pubkey(pk, *p, (size_t) (end - *p));
             *p += end - *p;
         }
     } else
@@ -684,7 +684,7 @@ static int pk_parse_key_sec1_der(mbedtls_pk_context *pk,
                                          MBEDTLS_ERR_ASN1_LENGTH_MISMATCH);
             }
 
-            if ((ret = mbedtls_pk_ecc_set_pubkey(pk, p, (size_t) (end2 - p), 1)) == 0) {
+            if ((ret = mbedtls_pk_ecc_set_pubkey(pk, p, (size_t) (end2 - p))) == 0) {
                 pubkey_done = 1;
             } else {
                 /*

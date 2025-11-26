@@ -130,8 +130,7 @@ exit:
 #endif /* MBEDTLS_PK_PARSE_EC_COMPRESSED */
 }
 
-int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, size_t pub_len,
-                              int is_keypair)
+int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, size_t pub_len)
 {
     /* Load the key */
     if (!PSA_ECC_FAMILY_IS_WEIERSTRASS(pk->ec_family) || *pub == 0x04) {
@@ -154,9 +153,10 @@ int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, 
     /* Validate the key by trying to import it */
     mbedtls_svc_key_id_t key_id = MBEDTLS_SVC_KEY_ID_INIT;
     psa_key_attributes_t key_attrs = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_type_t key_type =  PSA_KEY_TYPE_ECC_PUBLIC_KEY(pk->ec_family);
 
     psa_set_key_usage_flags(&key_attrs, 0);
-    psa_set_key_type(&key_attrs, PSA_KEY_TYPE_ECC_PUBLIC_KEY(pk->ec_family));
+    psa_set_key_type(&key_attrs, key_type);
     psa_set_key_bits(&key_attrs, pk->bits);
 
     if ((psa_import_key(&key_attrs, pk->pub_raw, pk->pub_raw_len,
@@ -165,10 +165,14 @@ int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, 
         return MBEDTLS_ERR_PK_INVALID_PUBKEY;
     }
 
-    /* If we are populating the public part of an existing key pair, do not
-     * update the PSA key type. */
-    if (!is_keypair) {
-        pk->psa_type = PSA_KEY_TYPE_ECC_PUBLIC_KEY(pk->ec_family);
+    if (pk->psa_type == PSA_KEY_TYPE_NONE) {
+        pk->psa_type = key_type;
+    } else {
+        /* If pk->psa_type is already set, ensure its public counterpart
+         * matches with the public key type we used above when testing the key. */
+        if (PSA_KEY_TYPE_PUBLIC_KEY_OF_KEY_PAIR(pk->psa_type) != key_type) {
+            return MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+        }
     }
 
     return 0;

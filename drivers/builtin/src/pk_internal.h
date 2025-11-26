@@ -109,10 +109,6 @@ int mbedtls_pk_ecc_set_key(mbedtls_pk_context *pk, unsigned char *key, size_t ke
  * [in/out] pk: in: must have its group set, see mbedtls_pk_ecc_set_group().
  *              out: will have the public key set.
  * [in] pub, pub_len: the raw public key (an ECPoint).
- * [in] is_keypair: 1 if this function is being used to populate the public
- *                  part of an existing key pair, so the psa_type should not
- *                  be updated to denote a public key.
- *                  0 if this function is being used to populate a public key.
  *
  * Return:
  * - 0 on success;
@@ -120,8 +116,7 @@ int mbedtls_pk_ecc_set_key(mbedtls_pk_context *pk, unsigned char *key, size_t ke
  *   but not supported;
  * - another error code otherwise.
  */
-int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, size_t pub_len,
-                              int is_keypair);
+int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, size_t pub_len);
 
 /*
  * Derive a public key from its private counterpart.
