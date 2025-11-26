@@ -136,8 +136,7 @@ typedef struct mbedtls_pk_context {
 
     /* The PSA key type of the key represented by the context.
      *
-     * Note: Valid even if the PK object is not backed by a PSA key
-     * (as is the case for public keys). */
+     * Note: Valid even for public keys, which are not backed by a PSA key. */
     psa_key_type_t MBEDTLS_PRIVATE(psa_type);
 
     /* The following field is used to store the ID of a private key.
