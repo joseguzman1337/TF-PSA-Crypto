@@ -49,6 +49,7 @@ void mbedtls_pk_init(mbedtls_pk_context *ctx)
      */
     ctx->pk_info = NULL;
     ctx->priv_id = MBEDTLS_SVC_KEY_ID_INIT;
+    ctx->psa_type = PSA_KEY_TYPE_NONE;
     memset(ctx->pub_raw, 0, sizeof(ctx->pub_raw));
     ctx->pub_raw_len = 0;
     ctx->bits = 0;
@@ -175,6 +176,7 @@ int mbedtls_pk_wrap_psa(mbedtls_pk_context *ctx,
 
     ctx->pk_info = info;
     ctx->priv_id = key;
+    ctx->psa_type = type;
 
     return 0;
 }
@@ -685,6 +687,11 @@ int mbedtls_pk_get_psa_attributes(const mbedtls_pk_context *pk,
     return 0;
 }
 
+psa_key_type_t mbedtls_pk_get_key_type(mbedtls_pk_context *pk)
+{
+    return pk->psa_type;
+}
+
 static psa_status_t export_import_into_psa(mbedtls_svc_key_id_t old_key_id,
                                            const psa_key_attributes_t *attributes,
                                            mbedtls_svc_key_id_t *new_key_id)
@@ -914,6 +921,8 @@ static int copy_from_psa(mbedtls_svc_key_id_t key_id,
         key_type = PSA_KEY_TYPE_PUBLIC_KEY_OF_KEY_PAIR(key_type);
     }
     key_bits = psa_get_key_bits(&key_attr);
+
+    pk->psa_type = key_type;
 
 #if defined(PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY)
     if ((key_type == PSA_KEY_TYPE_RSA_KEY_PAIR) ||
