@@ -443,7 +443,7 @@ static int pk_parse_key_rfc8410_der(mbedtls_pk_context *pk,
     /* mbedtls_pk_parse_key_pkcs8_unencrypted_der() only supports version 1
      * PKCS8 keys, which never contain a public key. As such, derive the public
      * key unconditionally. */
-    if ((ret = mbedtls_pk_ecc_set_pubkey_from_prv(pk, key, len)) != 0) {
+    if ((ret = mbedtls_pk_set_pubkey_from_prv(pk)) != 0) {
         return ret;
     }
 
@@ -701,7 +701,7 @@ static int pk_parse_key_sec1_der(mbedtls_pk_context *pk,
     }
 
     if (!pubkey_done) {
-        if ((ret = mbedtls_pk_ecc_set_pubkey_from_prv(pk, d, d_len)) != 0) {
+        if ((ret = mbedtls_pk_set_pubkey_from_prv(pk)) != 0) {
             return ret;
         }
     }

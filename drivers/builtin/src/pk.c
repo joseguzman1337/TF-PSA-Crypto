@@ -144,6 +144,23 @@ int mbedtls_pk_setup(mbedtls_pk_context *ctx, const mbedtls_pk_info_t *info)
 }
 
 /*
+ * Set the public key in PK context by exporting it from the private one.
+ */
+int mbedtls_pk_set_pubkey_from_prv(mbedtls_pk_context *pk)
+{
+    psa_status_t status;
+
+    /* Public key already available in the PK context. Nothing to do. */
+    if (pk->pub_raw_len > 0) {
+        return PSA_SUCCESS;
+    }
+
+    status = psa_export_public_key(pk->priv_id, pk->pub_raw, sizeof(pk->pub_raw),
+                                   &pk->pub_raw_len);
+    return psa_pk_status_to_mbedtls(status);
+}
+
+/*
  * Initialise a PSA-wrapping context
  */
 int mbedtls_pk_wrap_psa(mbedtls_pk_context *ctx,
@@ -938,7 +955,7 @@ static int copy_from_psa(mbedtls_svc_key_id_t key_id,
             if (ret != 0) {
                 goto exit;
             }
-            ret = mbedtls_pk_rsa_set_pubkey_from_prv(pk);
+            ret = mbedtls_pk_set_pubkey_from_prv(pk);
         } else {
             ret = mbedtls_pk_rsa_set_pubkey(pk, exp_key, exp_key_len);
         }
@@ -968,7 +985,7 @@ static int copy_from_psa(mbedtls_svc_key_id_t key_id,
             if (ret != 0) {
                 goto exit;
             }
-            ret = mbedtls_pk_ecc_set_pubkey_from_prv(pk, exp_key, exp_key_len);
+            ret = mbedtls_pk_set_pubkey_from_prv(pk);
         } else {
             ret = mbedtls_pk_ecc_set_pubkey(pk, exp_key, exp_key_len);
         }

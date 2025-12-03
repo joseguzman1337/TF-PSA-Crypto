@@ -117,22 +117,6 @@ int mbedtls_pk_ecc_set_key(mbedtls_pk_context *pk, unsigned char *key, size_t ke
  * - another error code otherwise.
  */
 int mbedtls_pk_ecc_set_pubkey(mbedtls_pk_context *pk, const unsigned char *pub, size_t pub_len);
-
-/*
- * Derive a public key from its private counterpart.
- * Computationally intensive, only use when public key is not available.
- *
- * [in/out] pk: in: must have the private key set, see mbedtls_pk_ecc_set_key().
- *              out: will have the public key set.
- * [in] prv, prv_len: the raw private key (see note below).
- *
- * Note: the private key information is always available from pk,
- * however for convenience the serialized version is also passed,
- * as it's available at each calling site, and useful in some configs
- * (as otherwise we would have to re-serialize it from the pk context).
- */
-int mbedtls_pk_ecc_set_pubkey_from_prv(mbedtls_pk_context *pk,
-                                       const unsigned char *prv, size_t prv_len);
 #endif /* PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY */
 
 #if defined(PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY)
@@ -145,12 +129,19 @@ int mbedtls_pk_rsa_set_key(mbedtls_pk_context *pk, const unsigned char *key, siz
  * Parse an RSA public key.
  */
 int mbedtls_pk_rsa_set_pubkey(mbedtls_pk_context *pk, const unsigned char *key, size_t key_len);
+#endif /* PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY */
 
 /*
- * Set the public key field in PK context by exporting it from the private key.
+ * Fill the public key fields of the given PK context by exporting it from
+ * the private counterpart.
+ *
+ * [in/out] pk: must have been populated with private key.
+ *
+ * Return:
+ * - 0 on success;
+ * - error code otherwise.
  */
-int mbedtls_pk_rsa_set_pubkey_from_prv(mbedtls_pk_context *pk);
-#endif /* PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY */
+int mbedtls_pk_set_pubkey_from_prv(mbedtls_pk_context *pk);
 
 #if defined(MBEDTLS_TEST_HOOKS)
 
