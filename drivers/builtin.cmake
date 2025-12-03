@@ -1,3 +1,11 @@
+# CMake module for building built-in and generated test drivers.
+# This file is meant to be included from `builtin/CMakeLists.txt` or
+# `libtestdriver1/CMakeLists.txt`.
+#
+# The following variables must be defined by the caller before including this
+# module:
+# - tf_psa_crypto_driver: the driver name (e.g. "builtin", "libtestdriver1")
+# - ${tf_psa_crypto_driver}_src_files: the list of source files for the driver
 
 if(CMAKE_COMPILER_IS_GNUCC)
     set(LIBS_C_FLAGS -Wmissing-declarations -Wmissing-prototypes)
