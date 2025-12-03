@@ -5,7 +5,10 @@ set(drivers
 )
 set(TF_PSA_CRYPTO_DRIVERS "${drivers}" PARENT_SCOPE)
 
-# Directories containing the headers exposed by drivers
+# Drivers currently depend on each other through the indirect inclusion of
+# `crypto_driver_contexts_*.h` headers, so all driver include paths must be
+# visible when building each driver. TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS
+# provides these include paths.
 set(TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}/builtin/include
         ${CMAKE_CURRENT_SOURCE_DIR}/everest/include
@@ -23,6 +26,22 @@ if(CMAKE_COMPILER_IS_MSVC)
     endif()
 endif()
 
+# Lists of driver targets.
+#
+# TF_PSA_CRYPTO_DRIVER_STATIC_TARGETS:
+#   The list of driver targets to use when building the static library
+#   (defined only if USE_STATIC_TF_PSA_CRYPTO_LIBRARY is enabled).
+#
+# TF_PSA_CRYPTO_DRIVER_TARGETS:
+#   The list of driver targets to use when building the shared library.
+#   If shared-library support is disabled, this list is identical to
+#   TF_PSA_CRYPTO_DRIVER_STATIC_TARGETS.
+#
+# Notes:
+# - TF_PSA_CRYPTO_DRIVER_TARGETS is not limited to shared builds; it may be
+#   used whenever the static/shared distinction does not matter (e.g. when
+#   collecting include directories from driver targets).
+#
 set(driver_targets "")
 foreach(driver ${drivers})
     list(APPEND driver_targets "${TF_PSA_CRYPTO_TARGET_PREFIX}${driver}")
