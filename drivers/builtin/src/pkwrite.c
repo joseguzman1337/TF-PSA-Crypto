@@ -478,11 +478,22 @@ int mbedtls_pk_write_key_der(const mbedtls_pk_context *key, unsigned char *buf, 
 /******************************************************************************
  * Public functions for public keys in "PSA friendly" format.
  ******************************************************************************/
-int mbedtls_pk_write_pubkey_psa(const mbedtls_pk_context *ctx, unsigned char *buf,
+int mbedtls_pk_write_pubkey_psa(mbedtls_pk_context *ctx, unsigned char *buf,
                                 size_t buf_size, size_t *buf_len)
 {
+    int ret;
+
     if ((ctx->pub_raw_len == 0) && (mbedtls_svc_key_id_is_null(ctx->priv_id))) {
         return MBEDTLS_ERR_PK_BAD_INPUT_DATA;
+    }
+
+    /* If public key fields of PK context are empty, fill them by exporting
+     * the public key from the private counterpart. */
+    if (ctx->pub_raw_len == 0) {
+        ret = mbedtls_pk_set_pubkey_from_prv(ctx);
+        if (ret != 0) {
+            return ret;
+        }
     }
 
     if (buf_size < ctx->pub_raw_len) {
