@@ -890,7 +890,7 @@ int mbedtls_pk_write_key_pem(const mbedtls_pk_context *ctx, unsigned char *buf, 
  *
  * \param ctx       PK context from which the public key is extracted. It must
  *                  have been populated.
- * \param buf       Output buffer where the pubblic key is written. It must not
+ * \param buf       Output buffer where the public key is written. It must not
  *                  be NULL.
  * \param buf_size  Size of \p buf buffer in bytes.
  *                  #PSA_EXPORT_PUBLIC_KEY_MAX_SIZE can be used as safe value
@@ -903,10 +903,10 @@ int mbedtls_pk_write_key_pem(const mbedtls_pk_context *ctx, unsigned char *buf, 
  *                  #mbedtls_pk_get_bitlen() on the same PK context.
  * \param buf_len   Amount of bytes written into \p buf if the exporting
  *                  operation is successful. In case of failure the value is 0.
+ *                  It must not be NULL.
  *
  * \return          0 if successful.
- * \return          MBEDTLS_ERR_PK_BAD_INPUT_DATA if \p ctx, \p buf or \p buf_len
- *                  pointers are \c NULL.
+ * \return          MBEDTLS_ERR_PK_BAD_INPUT_DATA if \p ctx has not been populated.
  * \return          MBEDTLS_ERR_PK_BUFFER_TOO_SMALL if the provided output buffer
  *                  is too small to contain the public key.
  */

@@ -481,7 +481,7 @@ int mbedtls_pk_write_key_der(const mbedtls_pk_context *key, unsigned char *buf, 
 int mbedtls_pk_write_pubkey_psa(const mbedtls_pk_context *ctx, unsigned char *buf,
                                 size_t buf_size, size_t *buf_len)
 {
-    if ((ctx == NULL) || (buf == NULL) || (buf_len == NULL) || (ctx->pub_raw_len == 0)) {
+    if ((ctx->pub_raw_len == 0) && (mbedtls_svc_key_id_is_null(ctx->priv_id))) {
         return MBEDTLS_ERR_PK_BAD_INPUT_DATA;
     }
 

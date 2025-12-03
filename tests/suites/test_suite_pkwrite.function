@@ -245,16 +245,6 @@ void pk_write_pubkey_psa(char *key_file)
 
     mbedtls_pk_init(&pk);
 
-    /* Test basic checks on input parameters */
-    TEST_EQUAL(mbedtls_pk_write_pubkey_psa(NULL, buf, sizeof(buf), &buf_len),
-               MBEDTLS_ERR_PK_BAD_INPUT_DATA);
-    TEST_EQUAL(mbedtls_pk_write_pubkey_psa(&pk, NULL, sizeof(buf), &buf_len),
-               MBEDTLS_ERR_PK_BAD_INPUT_DATA);
-    TEST_EQUAL(mbedtls_pk_write_pubkey_psa(&pk, buf, sizeof(buf), NULL),
-               MBEDTLS_ERR_PK_BAD_INPUT_DATA);
-    TEST_EQUAL(mbedtls_pk_write_pubkey_psa(&pk, buf, sizeof(buf), &buf_len),
-               MBEDTLS_ERR_PK_BAD_INPUT_DATA);
-
     USE_PSA_INIT();
     TEST_EQUAL(mbedtls_pk_parse_public_keyfile(&pk, key_file), 0);
 
