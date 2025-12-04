@@ -590,8 +590,8 @@
 #error "MBEDTLS_HAVE_INT32/MBEDTLS_HAVE_INT64 and MBEDTLS_HAVE_ASM cannot be defined simultaneously"
 #endif /* (MBEDTLS_HAVE_INT32 || MBEDTLS_HAVE_INT64) && MBEDTLS_HAVE_ASM */
 
-#if (defined(PSA_WANT_ECC_SECP_K1_192) || defined(PSA_WANT_ECC_SECP_K1_192)) //no-check-names
-#error "PSA_WANT_ECC_SECP_K1_192 and PSA_WANT_ECC_SECP_K1_192 are no longer supported"
+#if (defined(PSA_WANT_ECC_SECP_R1_192) || defined(PSA_WANT_ECC_SECP_K1_192)) //no-check-names
+#error "PSA_WANT_ECC_SECP_R1_192 and PSA_WANT_ECC_SECP_K1_192 are no longer supported"
 #endif
 
 /* *INDENT-ON* */
