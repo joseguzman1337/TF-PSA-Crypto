@@ -3400,7 +3400,7 @@ int mbedtls_ecp_self_test(int verbose)
     mbedtls_mpi_init(&m);
 
 #if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
-    /* Use secp192r1 if available, or any available curve */
+    /* Use secp256r1 if available, or any available curve */
 #if defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED)
     MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1));
 #else
