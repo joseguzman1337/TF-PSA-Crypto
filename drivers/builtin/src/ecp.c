@@ -3366,9 +3366,6 @@ int mbedtls_ecp_self_test(int verbose)
     mbedtls_mpi m;
 
 #if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
-    /* Exponents especially adapted for secp192k1, which has the lowest
-     * order n of all supported curves (secp192r1 is in a slightly larger
-     * field but the order of its base point is slightly smaller). */
     const char *sw_exponents[] =
     {
         "000000000000000000000000000000000000000000000001", /* one */
