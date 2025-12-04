@@ -155,6 +155,44 @@ exit:
     mbedtls_pk_free(&key);
     USE_PSA_DONE();
 }
+
+static void test_pk_write_pubkey_psa(mbedtls_pk_context *pk)
+{
+    uint8_t buf[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE + 1];
+    size_t buf_len, cur_size, safe_export_size;
+    int expected_ret;
+    int is_ec = PSA_KEY_TYPE_IS_ECC(mbedtls_pk_get_key_type(pk));
+
+    /* Compute the minimum buffer size that allows the export to be successful for
+     * the given key. */
+    if (is_ec) {
+        safe_export_size = PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(mbedtls_pk_get_bitlen(pk));
+    } else {
+        safe_export_size = PSA_KEY_EXPORT_RSA_PUBLIC_KEY_MAX_SIZE(mbedtls_pk_get_bitlen(pk));
+    }
+
+    for (cur_size = 0; cur_size < sizeof(buf); cur_size++) {
+        mbedtls_test_set_step(cur_size);
+        if (cur_size >= safe_export_size) {
+            /* If the buffer size is at least the safe length, then export must succeed. */
+            expected_ret = 0;
+        } else if (cur_size >= pk->pub_raw_len) {
+            /* If it's less than the safe length it might still succeed, but it depends
+             * on the real length of the data stored in the PK context. */
+            expected_ret = 0;
+        } else {
+            expected_ret = MBEDTLS_ERR_PK_BUFFER_TOO_SMALL;
+        }
+
+        TEST_EQUAL(mbedtls_pk_write_pubkey_psa(pk, buf, cur_size, &buf_len), expected_ret);
+        if (expected_ret == 0) {
+            TEST_EQUAL(buf_len, pk->pub_raw_len);
+        }
+    }
+
+exit:; /* The ";" is intentional: we need the "exit" label, but we don't have any action to
+        * to do, so the compiler would complain for that. */
+}
 /* END_HEADER */
 
 /* BEGIN_DEPENDENCIES
@@ -238,10 +276,6 @@ exit:
 void pk_write_pubkey_psa_from_file(char *key_file, int is_private)
 {
     mbedtls_pk_context pk;
-    uint8_t buf[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE + 1];
-    size_t buf_len, cur_size, safe_export_size;
-    int expected_ret;
-    int is_ec;
 
     mbedtls_pk_init(&pk);
 
@@ -253,34 +287,8 @@ void pk_write_pubkey_psa_from_file(char *key_file, int is_private)
         TEST_EQUAL(mbedtls_pk_parse_public_keyfile(&pk, key_file), 0);
     }
 
-    is_ec = PSA_KEY_TYPE_IS_ECC(mbedtls_pk_get_key_type(&pk));
-
-    /* Compute the minimum buffer size that allows the export to be successful for
-     * the given key. */
-    if (is_ec) {
-        safe_export_size = PSA_KEY_EXPORT_ECC_PUBLIC_KEY_MAX_SIZE(mbedtls_pk_get_bitlen(&pk));
-    } else {
-        safe_export_size = PSA_KEY_EXPORT_RSA_PUBLIC_KEY_MAX_SIZE(mbedtls_pk_get_bitlen(&pk));
-    }
-
-    for (cur_size = 0; cur_size < sizeof(buf); cur_size++) {
-        mbedtls_test_set_step(cur_size);
-        if (cur_size >= safe_export_size) {
-            /* If the buffer size is at least the safe length, then export must succeed. */
-            expected_ret = 0;
-        } else if (cur_size >= pk.pub_raw_len) {
-            /* If it's less than the safe length it might still succeed, but it depends
-             * on the real length of the data stored in the PK context. */
-            expected_ret = 0;
-        } else {
-            expected_ret = MBEDTLS_ERR_PK_BUFFER_TOO_SMALL;
-        }
-
-        TEST_EQUAL(mbedtls_pk_write_pubkey_psa(&pk, buf, cur_size, &buf_len), expected_ret);
-        if (expected_ret == 0) {
-            TEST_EQUAL(buf_len, pk.pub_raw_len);
-        }
-    }
+    /* No need to check for return value here: TEST_EQUAL() macros are used in this function */
+    test_pk_write_pubkey_psa(&pk);
 
 exit:
     mbedtls_pk_free(&pk);
