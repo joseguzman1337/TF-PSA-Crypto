@@ -7,17 +7,6 @@ if(CMAKE_COMPILER_IS_CLANG)
     set(LIBS_C_FLAGS -Wmissing-declarations -Wmissing-prototypes -Wdocumentation -Wno-documentation-deprecated-sync -Wunreachable-code)
 endif(CMAKE_COMPILER_IS_CLANG)
 
-if(CMAKE_COMPILER_IS_MSVC)
-    if(MSVC_STATIC_RUNTIME)
-        foreach(flag_var
-            CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
-            CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
-            CMAKE_C_FLAGS_CHECK)
-            string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-        endforeach(flag_var)
-    endif()
-endif()
-
 set(${tf_psa_crypto_driver}_target ${TF_PSA_CRYPTO_TARGET_PREFIX}${tf_psa_crypto_driver})
 if (USE_STATIC_TF_PSA_CRYPTO_LIBRARY)
     set(${tf_psa_crypto_driver}_static_target ${${tf_psa_crypto_driver}_target})
