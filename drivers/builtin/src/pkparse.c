@@ -1101,7 +1101,8 @@ int mbedtls_pk_parse_key(mbedtls_pk_context *pk,
 
     pk_info = mbedtls_pk_info_from_type(MBEDTLS_PK_RSA);
     if (mbedtls_pk_setup(pk, pk_info) == 0 &&
-        mbedtls_pk_rsa_set_key(pk, key, keylen) == 0) {
+        (mbedtls_pk_rsa_set_key(pk, key, keylen) == 0) &&
+        (mbedtls_pk_set_pubkey_from_prv(pk) == 0)) {
         return 0;
     }
 
