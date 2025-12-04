@@ -235,7 +235,7 @@ exit:
 /* END_CASE */
 
 /* BEGIN_CASE */
-void pk_write_pubkey_psa(char *key_file)
+void pk_write_pubkey_psa(char *key_file, int is_private)
 {
     mbedtls_pk_context pk;
     uint8_t buf[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE + 1];
@@ -247,7 +247,11 @@ void pk_write_pubkey_psa(char *key_file)
 
     PSA_INIT();
 
-    TEST_EQUAL(mbedtls_pk_parse_public_keyfile(&pk, key_file), 0);
+    if (is_private) {
+        TEST_EQUAL(mbedtls_pk_parse_keyfile(&pk, key_file, NULL), 0);
+    } else {
+        TEST_EQUAL(mbedtls_pk_parse_public_keyfile(&pk, key_file), 0);
+    }
 
     is_ec = PSA_KEY_TYPE_IS_ECC(mbedtls_pk_get_key_type(&pk));
 
@@ -260,6 +264,7 @@ void pk_write_pubkey_psa(char *key_file)
     }
 
     for (cur_size = 0; cur_size < sizeof(buf); cur_size++) {
+        mbedtls_test_set_step(cur_size);
         if (cur_size >= safe_export_size) {
             /* If the buffer size is at least the safe length, then export must succeed. */
             expected_ret = 0;
