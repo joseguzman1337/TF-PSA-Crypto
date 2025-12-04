@@ -245,15 +245,11 @@ void pk_write_pubkey_psa(char *key_file)
 
     mbedtls_pk_init(&pk);
 
-    USE_PSA_INIT();
+    PSA_INIT();
+
     TEST_EQUAL(mbedtls_pk_parse_public_keyfile(&pk, key_file), 0);
 
-    /* TODO: Replace this with mbedtls_pk_get_type() once it will be available */
-#if defined(PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY)
-    is_ec = (pk.ec_family != 0);
-#else
-    is_ec = 0;
-#endif
+    is_ec = PSA_KEY_TYPE_IS_ECC(mbedtls_pk_get_key_type(&pk));
 
     /* Compute the minimum buffer size that allows the export to be successful for
      * the given key. */
@@ -283,6 +279,6 @@ void pk_write_pubkey_psa(char *key_file)
 
 exit:
     mbedtls_pk_free(&pk);
-    USE_PSA_DONE();
+    PSA_DONE();
 }
 /* END_CASE */
