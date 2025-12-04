@@ -235,7 +235,7 @@ exit:
 /* END_CASE */
 
 /* BEGIN_CASE */
-void pk_write_pubkey_psa(char *key_file, int is_private)
+void pk_write_pubkey_psa_from_file(char *key_file, int is_private)
 {
     mbedtls_pk_context pk;
     uint8_t buf[PSA_EXPORT_PUBLIC_KEY_MAX_SIZE + 1];
