@@ -1,6 +1,13 @@
-# CMake module for building built-in and generated test drivers.
-# This file is meant to be included from `builtin/CMakeLists.txt` or
-# `libtestdriver1/CMakeLists.txt`.
+# CMake module for building drivers.
+# This file is meant to be included from the `CMakeLists.txt` of drivers, e.g.
+# in `builtin/CMakeLists.txt`.
+#
+# We do not use it for everest and p256-m for the time being, but it is one
+# of the goals of https://github.com/Mbed-TLS/TF-PSA-Crypto/issues/579 to fix
+# that.
+#
+# The driver public headers should be located in the `drivers/*/include`
+# directory.
 #
 # The following variables must be defined by the caller before including this
 # module:
