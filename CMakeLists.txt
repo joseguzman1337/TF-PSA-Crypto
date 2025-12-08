@@ -416,9 +416,7 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
 
     foreach(driver_target ${TF_PSA_CRYPTO_DRIVER_TARGETS})
         get_target_property(public_includes ${driver_target} INTERFACE_INCLUDE_DIRECTORIES)
-        if(public_includes)
-            target_include_directories(tf_psa_crypto_test PUBLIC ${public_includes})
-        endif()
+        target_include_directories(tf_psa_crypto_test PUBLIC ${public_includes})
     endforeach()
 
     # Request C11, needed for memory poisoning tests
