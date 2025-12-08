@@ -32,10 +32,8 @@ foreach (target IN LISTS target_libraries)
 
     target_include_directories(${target}
       PUBLIC include
-      PRIVATE ${TF_PSA_CRYPTO_DIR}/drivers/${tf_psa_crypto_driver}/include
-              ${TF_PSA_CRYPTO_DIR}/drivers/${tf_psa_crypto_driver}/src
-              ${TF_PSA_CRYPTO_DIR}/include
-              ${TF_PSA_CRYPTO_DIR}/core
+      PRIVATE ${PROJECT_SOURCE_DIR}/include
+              ${PROJECT_SOURCE_DIR}/core
               ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS})
     tf_psa_crypto_set_config_files_compile_definitions(${target})
 endforeach(target)
