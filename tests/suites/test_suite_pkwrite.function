@@ -183,9 +183,10 @@ static void test_pk_write_pubkey_psa(mbedtls_pk_context *pk)
         if (cur_size >= safe_export_size) {
             /* If the buffer size is at least the safe length, then export must succeed. */
             expected_ret = 0;
-        } else if (cur_size >= pk->pub_raw_len) {
+        } else if ((cur_size >= pk->pub_raw_len) && (pk->pub_raw_len > 0)) {
             /* If it's less than the safe length it might still succeed, but it depends
-             * on the real length of the data stored in the PK context. */
+             * on the real length of the data stored in the PK context. In this case
+             * "pk->pub_raw_len" must be set, of course. */
             expected_ret = 0;
         } else {
             expected_ret = MBEDTLS_ERR_PK_BUFFER_TOO_SMALL;
