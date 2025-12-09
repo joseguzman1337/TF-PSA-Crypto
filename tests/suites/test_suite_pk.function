@@ -144,24 +144,6 @@
 #define MBEDTLS_MD_ALG_FOR_TEST         MBEDTLS_MD_SHA512
 #endif
 
-/* >>> DIRTY FIX!!! <<<
- * Ideally the good thing to do is to modify generate_test_keys.py so that it
- * doesn't generate secp192 keys when in tf-psa-crypto, while keeping it for
- * 3.6 branch. That PR would be a prerequisite for this one. But the problem
- * in doing so is that the framework PR wouldn't have CI green because at that
- * point tf-psa-crypto would still test secp192 while the python script would
- * no more generate those keys...
- * The solution is the following:
- * - hardcode the #define values we miss here for the time being;
- * - merge this PR;
- * - modify generate_test_keys.py as mentioned above;
- * - remove this fix.
- *
- * This will be addressed in crypto#591
- */
-#define MBEDTLS_ECP_DP_SECP192K1    (MBEDTLS_ECP_DP_CURVE448 + 1)
-#define MBEDTLS_ECP_DP_SECP192R1    (MBEDTLS_ECP_DP_CURVE448 + 2)
-
 #include <test/test_keys.h>
 
 /* Define an RSA key size we know it's present in predefined_key[] array. */
