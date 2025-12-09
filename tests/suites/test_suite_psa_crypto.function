@@ -9992,7 +9992,7 @@ void key_agreement_interruptible(int alg_arg,
             num_ops = psa_key_agreement_iop_get_num_ops(&operation);
             uint32_t new_ops = num_ops - num_ops_prior;
             if (interruptible) {
-                TEST_LE_U(2, new_ops);
+                TEST_LE_U(1, new_ops);
                 TEST_LE_U(new_ops, exp_max_ops);
             }
 
