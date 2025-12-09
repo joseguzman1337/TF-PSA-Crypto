@@ -152,7 +152,7 @@ int mbedtls_pk_set_pubkey_from_prv(mbedtls_pk_context *pk)
 
     /* Public key already available in the PK context. Nothing to do. */
     if (pk->pub_raw_len > 0) {
-        return PSA_SUCCESS;
+        return 0;
     }
 
     status = psa_export_public_key(pk->priv_id, pk->pub_raw, sizeof(pk->pub_raw),
