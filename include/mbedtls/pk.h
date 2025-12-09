@@ -909,9 +909,8 @@ int mbedtls_pk_write_key_pem(const mbedtls_pk_context *ctx, unsigned char *buf, 
  * \return          #MBEDTLS_ERR_PK_BAD_INPUT_DATA if \p ctx has not been populated.
  * \return          #MBEDTLS_ERR_PK_BUFFER_TOO_SMALL if the provided output buffer
  *                  is too small to contain the public key.
- * \return          Another error code on other failures.
  */
-int mbedtls_pk_write_pubkey_psa(mbedtls_pk_context *ctx, unsigned char *buf,
+int mbedtls_pk_write_pubkey_psa(const mbedtls_pk_context *ctx, unsigned char *buf,
                                 size_t buf_size, size_t *buf_len);
 #endif /* MBEDTLS_PK_WRITE_C */
 
