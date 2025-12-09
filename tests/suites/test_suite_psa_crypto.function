@@ -9975,6 +9975,9 @@ void key_agreement_interruptible(int alg_arg,
     TEST_EQUAL(num_ops_prior, MBEDTLS_ECP_OPS_CHK);
 
     min_num_ops = interruptible_operations_get_min_num_ops(key_bits);
+    /* Each call should complete in up to the maximum number of operations
+     * specified, unless that is less than the minimum number of ops possible in
+     * one go for the specified curve size. */
     uint32_t exp_max_ops = max_ops <= min_num_ops ? min_num_ops : max_ops;
 
     psa_ecc_family_t fam = PSA_KEY_TYPE_ECC_GET_FAMILY(our_key_type);
@@ -9986,10 +9989,6 @@ void key_agreement_interruptible(int alg_arg,
         status = psa_key_agreement_iop_complete(&operation, &output_key);
 
         if (status == PSA_SUCCESS || status == PSA_OPERATION_INCOMPLETE) {
-            /* Ensure that each operation finished in less than or equal
-               maximum number of operations specefied unless the maximum
-               number of operations was less than the minium possible for
-               the curve size. */
             num_ops = psa_key_agreement_iop_get_num_ops(&operation);
             uint32_t new_ops = num_ops - num_ops_prior;
             if (interruptible) {
