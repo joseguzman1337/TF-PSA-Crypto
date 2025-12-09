@@ -17,6 +17,11 @@ typedef enum {
     TEST_COPY_PUBLIC_FROM_PSA,
 } pkwrite_pk_derivation_method_t;
 
+typedef enum {
+    TEST_PUBLIC_KEY,
+    TEST_PRIVATE_KEY,
+} pkwrite_key_type_t;
+
 /* Helper function for removing "\r" chars from a buffer. */
 static void fix_new_lines(unsigned char *in_str, size_t *len)
 {
