@@ -365,6 +365,9 @@ void pk_write_pubkey_psa_from_psa(int key_type, int key_bits, int pk_gen_method)
             TEST_FAIL("Unknown method");
     }
 
+    /* No need to check for return value here: TEST_EQUAL() macros are used in this function */
+    test_pk_write_pubkey_psa(&pk);
+
 exit:
     mbedtls_pk_free(&pk);
     psa_destroy_key(key_id);
