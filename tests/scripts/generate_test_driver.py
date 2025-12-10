@@ -71,12 +71,22 @@ class TFPSACryptoTestDriverGenerator(test_driver.TestDriverGenerator):
 
         identifiers.difference_update(external_identifiers)
 
-        # MBEDTLS_ECP_LIGHT is defined in
-        # tf-psa-crypto/private/crypto_adjust_config_support.h
-        # if MBEDTLS_PK_PARSE_EC_EXTENDED or MBEDTLS_PK_PARSE_EC_COMPRESSED is
-        # enabled. It thus appears in 'external_identifiers' but is a built-in
-        # driver identifier that should be renamed thus force its renaming.
-        identifiers.add("MBEDTLS_ECP_LIGHT")
+        # MBEDTLS_ECP_LIGHT is enabled in crypto_adjust_config_enable_builtins.h
+        # if either MBEDTLS_PK_PARSE_EC_EXTENDED or MBEDTLS_PK_PARSE_EC_COMPRESSED
+        # is enabled. When compiling libtestdriver1 without any ECC support, this
+        # triggers the pre-processor error:
+        #   #error "Missing definition of LIBTESTDRIVER1_MBEDTLS_ECP_MAX_BITS"
+        #
+        # To prevent MBEDTLS_PK_PARSE_EC_EXTENDED and MBEDTLS_PK_PARSE_EC_COMPRESSED
+        # from affecting libtestdriver1 (as they should not), we prefix them.
+        # This turns them into the libtestdriver1-specific configuration options
+        #   LIBTESTDRIVER1_MBEDTLS_PK_PARSE_EC_EXTENDED and
+        #   LIBTESTDRIVER1_MBEDTLS_PK_PARSE_EC_COMPRESSED
+        # which are never enabled. As a result, they do not trigger the
+        # enablement of LIBTESTDRIVER1_MBEDTLS_ECP_LIGHT in
+        # libtestdriver1-crypto_adjust_config_enable_builtins.h.
+        identifiers.add("MBEDTLS_PK_PARSE_EC_EXTENDED")
+        identifiers.add("MBEDTLS_PK_PARSE_EC_COMPRESSED")
 
         # MBEDTLS_PSA_ACCEL_ are not defined in the code base. They are
         # supposed to be passed as extra configuration options. We want to
