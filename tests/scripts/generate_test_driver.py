@@ -99,11 +99,8 @@ def main():
     if not build_tree.looks_like_tf_psa_crypto_root("."):
         raise RuntimeError("This script must be run from TF-PSA-Crypto root.")
 
-    dst_dir = Path(args.dst_dir)
-    if not dst_dir.is_dir():
-        raise RuntimeError(f"{args.dst_dir} directory not found.")
-
-    generator = TFPSACryptoTestDriverGenerator(Path("drivers/builtin"), dst_dir, \
+    generator = TFPSACryptoTestDriverGenerator(Path("drivers/builtin"), \
+                                               Path(args.dst_dir), \
                                                args.driver, EXCLUDE_FILES)
 
     if args.list_vars_for_cmake:
