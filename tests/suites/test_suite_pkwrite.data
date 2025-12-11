@@ -233,3 +233,6 @@ pk_write_pubkey_psa_from_psa:PSA_KEY_TYPE_RSA_KEY_PAIR:1024:TEST_COPY_PUBLIC_FRO
 Export public key PSA - pk_copy_public_from_psa - RSA 4096 bits
 depends_on:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_IMPORT:PSA_WANT_KEY_TYPE_RSA_KEY_PAIR_EXPORT:MBEDTLS_TEST_PK_ALLOW_RSA_KEY_PAIR_4096
 pk_write_pubkey_psa_from_psa:PSA_KEY_TYPE_RSA_KEY_PAIR:4096:TEST_COPY_PUBLIC_FROM_PSA
+
+Export public key PSA - unpopulated PK context
+pk_write_pubkey_psa_unpopulated:
