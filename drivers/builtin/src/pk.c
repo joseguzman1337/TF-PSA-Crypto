@@ -138,6 +138,23 @@ int mbedtls_pk_setup(mbedtls_pk_context *ctx, const mbedtls_pk_info_t *info)
 }
 
 /*
+ * Set the public key in PK context by exporting it from the private one.
+ */
+int mbedtls_pk_set_pubkey_from_prv(mbedtls_pk_context *pk)
+{
+    psa_status_t status;
+
+    /* Public key already available in the PK context. Nothing to do. */
+    if (pk->pub_raw_len > 0) {
+        return 0;
+    }
+
+    status = psa_export_public_key(pk->priv_id, pk->pub_raw, sizeof(pk->pub_raw),
+                                   &pk->pub_raw_len);
+    return psa_pk_status_to_mbedtls(status);
+}
+
+/*
  * Initialise a PSA-wrapping context
  */
 int mbedtls_pk_wrap_psa(mbedtls_pk_context *ctx,
@@ -146,6 +163,7 @@ int mbedtls_pk_wrap_psa(mbedtls_pk_context *ctx,
     const mbedtls_pk_info_t *info = NULL;
     psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
     psa_key_type_t type;
+    int ret;
 
     if (ctx == NULL || ctx->pk_info != NULL) {
         return MBEDTLS_ERR_PK_BAD_INPUT_DATA;
@@ -168,8 +186,15 @@ int mbedtls_pk_wrap_psa(mbedtls_pk_context *ctx,
         return MBEDTLS_ERR_PK_FEATURE_UNAVAILABLE;
     }
 
-    ctx->pk_info = info;
     ctx->priv_id = key;
+
+    ret = mbedtls_pk_set_pubkey_from_prv(ctx);
+    if (ret != 0) {
+        ctx->priv_id = MBEDTLS_SVC_KEY_ID_INIT;
+        return ret;
+    }
+
+    ctx->pk_info = info;
     ctx->psa_type = type;
 
     return 0;
@@ -932,7 +957,7 @@ static int copy_from_psa(mbedtls_svc_key_id_t key_id,
             if (ret != 0) {
                 goto exit;
             }
-            ret = mbedtls_pk_rsa_set_pubkey_from_prv(pk);
+            ret = mbedtls_pk_set_pubkey_from_prv(pk);
         } else {
             ret = mbedtls_pk_rsa_set_pubkey(pk, exp_key, exp_key_len);
         }
@@ -962,7 +987,7 @@ static int copy_from_psa(mbedtls_svc_key_id_t key_id,
             if (ret != 0) {
                 goto exit;
             }
-            ret = mbedtls_pk_ecc_set_pubkey_from_prv(pk, exp_key, exp_key_len);
+            ret = mbedtls_pk_set_pubkey_from_prv(pk);
         } else {
             ret = mbedtls_pk_ecc_set_pubkey(pk, exp_key, exp_key_len);
         }

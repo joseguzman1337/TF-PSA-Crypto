@@ -103,13 +103,4 @@ int mbedtls_pk_rsa_set_pubkey(mbedtls_pk_context *pk, const unsigned char *key, 
 
     return 0;
 }
-
-int mbedtls_pk_rsa_set_pubkey_from_prv(mbedtls_pk_context *pk)
-{
-    psa_status_t status;
-
-    status = psa_export_public_key(pk->priv_id, pk->pub_raw, sizeof(pk->pub_raw),
-                                   &pk->pub_raw_len);
-    return PSA_PK_TO_MBEDTLS_ERR(status);
-}
 #endif /* PSA_WANT_KEY_TYPE_RSA_PUBLIC_KEY */

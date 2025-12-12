@@ -61,18 +61,6 @@ int mbedtls_pk_ecc_set_key(mbedtls_pk_context *pk, unsigned char *key, size_t ke
     return psa_pk_status_to_mbedtls(status);
 }
 
-int mbedtls_pk_ecc_set_pubkey_from_prv(mbedtls_pk_context *pk,
-                                       const unsigned char *prv, size_t prv_len)
-{
-    (void) prv;
-    (void) prv_len;
-    psa_status_t status;
-
-    status = psa_export_public_key(pk->priv_id, pk->pub_raw, sizeof(pk->pub_raw),
-                                   &pk->pub_raw_len);
-    return psa_pk_status_to_mbedtls(status);
-}
-
 /*
  * Set the public key.
  *
