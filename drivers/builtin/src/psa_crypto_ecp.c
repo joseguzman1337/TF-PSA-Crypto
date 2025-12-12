@@ -765,11 +765,6 @@ psa_status_t mbedtls_psa_key_agreement_iop_setup(
     size_t peer_key_length)
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
-    mbedtls_ecp_keypair *our_key = NULL;
-    mbedtls_ecp_keypair *their_key = NULL;
-
-    mbedtls_ecdh_init(&operation->ctx);
-    mbedtls_ecdh_enable_restart(&operation->ctx);
 
     /* We need to clear number of ops here in case there was a previous
        complete operation which doesn't reset it after finsishing. */
@@ -786,27 +781,17 @@ psa_status_t mbedtls_psa_key_agreement_iop_setup(
         psa_get_key_bits(private_key_attributes),
         private_key_buffer,
         private_key_buffer_len,
-        &our_key);
+        &operation->our_key);
     if (status != PSA_SUCCESS) {
         goto exit;
     }
-
-    status = mbedtls_to_psa_error(
-        mbedtls_ecdh_get_params(&operation->ctx, our_key, MBEDTLS_ECDH_OURS));
-    if (status != PSA_SUCCESS) {
-        goto exit;
-    }
-
-    mbedtls_ecp_keypair_free(our_key);
-    mbedtls_free(our_key);
-    our_key = NULL;
 
     status = mbedtls_psa_ecp_load_representation(
         PSA_KEY_TYPE_PUBLIC_KEY_OF_KEY_PAIR(private_key_type),
         psa_get_key_bits(private_key_attributes),
         peer_key,
         peer_key_length,
-        &their_key);
+        &operation->their_key);
     if (status != PSA_SUCCESS) {
         goto exit;
     }
@@ -815,17 +800,7 @@ psa_status_t mbedtls_psa_key_agreement_iop_setup(
        takes MBEDTLS_ECP_OPS_CHK amount of ops. */
     operation->num_ops += MBEDTLS_ECP_OPS_CHK;
 
-    status = mbedtls_to_psa_error(
-        mbedtls_ecdh_get_params(&operation->ctx, their_key, MBEDTLS_ECDH_THEIRS));
-    if (status != PSA_SUCCESS) {
-        goto exit;
-    }
-
 exit:
-    mbedtls_ecp_keypair_free(our_key);
-    mbedtls_free(our_key);
-    mbedtls_ecp_keypair_free(their_key);
-    mbedtls_free(their_key);
     return status;
 }
 
@@ -836,16 +811,38 @@ psa_status_t mbedtls_psa_key_agreement_iop_complete(
     size_t *shared_secret_length)
 {
     psa_status_t status = PSA_ERROR_CORRUPTION_DETECTED;
+    mbedtls_ecp_point secret;
+
+    mbedtls_ecp_point_init(&secret);
 
     mbedtls_psa_interruptible_set_max_ops(psa_interruptible_get_max_ops());
 
-    status = mbedtls_to_psa_error(mbedtls_ecdh_calc_secret(&operation->ctx, shared_secret_length,
-                                                           shared_secret,
-                                                           shared_secret_size,
-                                                           mbedtls_psa_get_random,
-                                                           MBEDTLS_PSA_RANDOM_STATE));
+    status = mbedtls_to_psa_error(
+        mbedtls_ecp_mul_restartable(&operation->our_key->grp,
+                                    &secret,
+                                    &operation->our_key->d,
+                                    &operation->their_key->Q,
+                                    mbedtls_psa_get_random,
+                                    MBEDTLS_PSA_RANDOM_STATE,
+                                    &operation->rs));
+    operation->num_ops += operation->rs.ops_done;
+    if (status != PSA_SUCCESS) {
+        goto exit;
+    }
 
-    operation->num_ops += operation->ctx.rs.ops_done;
+    *shared_secret_length = PSA_BITS_TO_BYTES(operation->our_key->grp.pbits);
+    if (shared_secret_size < *shared_secret_length) {
+        status = PSA_ERROR_BUFFER_TOO_SMALL;
+        goto exit;
+    }
+
+    status = mbedtls_to_psa_error(
+        mbedtls_ecp_get_type(&operation->our_key->grp) == MBEDTLS_ECP_TYPE_MONTGOMERY ?
+        mbedtls_mpi_write_binary_le(&secret.X, shared_secret, *shared_secret_length) :
+        mbedtls_mpi_write_binary(&secret.X, shared_secret, *shared_secret_length));
+
+exit:
+    mbedtls_ecp_point_free(&secret);
 
     return status;
 }
@@ -853,8 +850,15 @@ psa_status_t mbedtls_psa_key_agreement_iop_complete(
 psa_status_t mbedtls_psa_key_agreement_iop_abort(
     mbedtls_psa_key_agreement_interruptible_operation_t *operation)
 {
+    mbedtls_ecp_keypair_free(operation->our_key);
+    mbedtls_free(operation->our_key);
+
+    mbedtls_ecp_keypair_free(operation->their_key);
+    mbedtls_free(operation->their_key);
+
+    mbedtls_ecp_restart_free(&operation->rs);
     operation->num_ops = 0;
-    mbedtls_ecdh_free(&operation->ctx);
+
     return PSA_SUCCESS;
 }
 
