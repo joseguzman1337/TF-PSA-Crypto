@@ -407,7 +407,7 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
             DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/include/test/test_keys.h)
         add_dependencies(tf_psa_crypto_test tf_psa_crypto_test_keys_header)
         if(TF_PSA_CRYPTO_TEST_DRIVER)
-            add_dependencies(tf_psa_crypto_test tf_psa_crypto_test_driver_src)
+            add_dependencies(tf_psa_crypto_test ${TF_PSA_CRYPTO_TEST_DRIVER_GENERATION_TARGETS})
         endif()
     endif()
 

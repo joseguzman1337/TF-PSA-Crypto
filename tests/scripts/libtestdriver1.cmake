@@ -27,7 +27,7 @@ add_custom_command(
     COMMENT "Generating test driver libtestdriver1 tree"
 )
 
-add_custom_target(tf_psa_crypto_test_driver_src
+add_custom_target(libtestdriver1_generation
     DEPENDS ${libtestdriver1_files})
 
 set(tf_psa_crypto_driver "libtestdriver1")

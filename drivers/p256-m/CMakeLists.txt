@@ -23,7 +23,7 @@ foreach (target IN LISTS target_libraries)
     )
     tf_psa_crypto_set_config_files_compile_definitions(${target})
     if(TF_PSA_CRYPTO_TEST_DRIVER)
-        add_dependencies(${target} tf_psa_crypto_test_driver_src)
+        add_dependencies(${target} ${TF_PSA_CRYPTO_TEST_DRIVER_GENERATION_TARGETS})
     endif()
 endforeach(target)
 
