@@ -26,11 +26,18 @@ if(CMAKE_COMPILER_IS_MSVC)
 endif()
 
 if(TF_PSA_CRYPTO_TEST_DRIVER)
-    # Use `libtestdriver1` as the driver name to align with the name used in
-    # Mbed TLS. This allows to reuse most of the test driver code as it is.
+    # Use `libtestdriver1` as the driver name to align with the name used so
+    # far for driver dispatch testing in Mbed TLS. This allows to reuse most
+    # of the test driver code as it is.
     list(APPEND drivers libtestdriver1)
     list(APPEND TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/libtestdriver1/include)
 
+    # In the build tree, create a `drivers/libtestdriver1` directory, copy
+    # `tests/scripts/libtestdriver1.cmake` to it as `CMakeLists.txt`, and add
+    # that directory as a subdirectory. This causes the test driver tree
+    # defined in `libtestdriver1.cmake` to be configured and built as part of
+    # the main build. The libtestdriver1 code is generated and compiled in the
+    # build tree, similarly to an in-source-tree build.
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libtestdriver1)
     configure_file(
         ${PROJECT_SOURCE_DIR}/tests/scripts/libtestdriver1.cmake
