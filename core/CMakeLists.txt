@@ -172,6 +172,8 @@ foreach(target IN LISTS target_libraries)
         endforeach()
     endforeach()
     if(TF_PSA_CRYPTO_TEST_DRIVER)
+        # See the note on include directories for tf_psa_crypto_test target
+        # regarding "tests/include/test".
         target_include_directories(${target}
             PRIVATE ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/tests/include
                     ${PROJECT_SOURCE_DIR}/tests/include/test)

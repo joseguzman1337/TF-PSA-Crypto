@@ -9,6 +9,10 @@ if(result)
     message(FATAL_ERROR "Generation of list-vars.cmake failed: ${result}")
 endif()
 
+# libtestdriver1-list-vars.cmake defines three list variables:
+# - libtestdriver1_input_files: the list of generate_test_driver.py input files
+# - libtestdriver1_files: the list of generate_test_driver.py output files
+# - libtestdriver1_src_files: the list of generate_test_driver.py output C files
 include(${CMAKE_CURRENT_BINARY_DIR}/libtestdriver1-list-vars.cmake)
 
 set(input_files "")

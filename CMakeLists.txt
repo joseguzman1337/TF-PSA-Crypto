@@ -416,6 +416,12 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
         "This is a seedfile that contains 64 bytes ......................"
     )
 
+    # Note: "tests/include/test" exists solely to provide access to
+    #       "mbedtls/build_info.h". That header is an alias of
+    #       "tf-psa-crypto/build_info.h".
+    #
+    #       It is included in framework headers and C modules because those
+    #       components are also used in the Mbed TLS context.
     target_include_directories(tf_psa_crypto_test
         PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/tests/include
                 ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/tests/include
