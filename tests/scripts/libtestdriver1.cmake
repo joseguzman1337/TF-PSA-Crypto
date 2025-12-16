@@ -2,7 +2,7 @@ execute_process(
     COMMAND ${TF_PSA_CRYPTO_PYTHON_EXECUTABLE}
             ./tests/scripts/generate_test_driver.py
             ${CMAKE_CURRENT_BINARY_DIR}
-            --list-vars-for-cmake
+            --list-vars-for-cmake libtestdriver1-list-vars.cmake
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     RESULT_VARIABLE result)
 if(result)
