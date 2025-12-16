@@ -1,3 +1,8 @@
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+    ${PROJECT_SOURCE_DIR}/tests/scripts/generate_test_driver.py
+)
+
+message(STATUS "Generating libtestdriver1-list-vars.cmake")
 execute_process(
     COMMAND ${TF_PSA_CRYPTO_PYTHON_EXECUTABLE}
             ./tests/scripts/generate_test_driver.py
