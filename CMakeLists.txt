@@ -111,6 +111,7 @@ if(CMAKE_COMPILER_IS_MSVC)
 else()
     option(ENABLE_TESTING "Build TF-PSA-Crypto tests." ON)
 endif()
+option(TF_PSA_CRYPTO_TEST_DRIVER "Build TF-PSA-Crypto test driver for driver dispatch testing" OFF)
 
 option(USE_STATIC_TF_PSA_CRYPTO_LIBRARY "Build TF-PSA-Crypto static library." ON)
 option(USE_SHARED_TF_PSA_CRYPTO_LIBRARY "Build TF-PSA-Crypto shared library." OFF)
@@ -218,6 +219,13 @@ function(tf_psa_crypto_set_base_compile_options target)
         tf_psa_crypto_set_iar_base_compile_options(${target})
     elseif(CMAKE_COMPILER_IS_MSVC)
         tf_psa_crypto_set_msvc_base_compile_options(${target})
+    endif()
+    if(TF_PSA_CRYPTO_TEST_DRIVER)
+        target_compile_definitions(${target}
+            PRIVATE "-DPSA_CRYPTO_DRIVER_TEST"
+                    "-DMBEDTLS_TEST_LIBTESTDRIVER1"
+                    "-DTF_PSA_CRYPTO_TEST_LIBTESTDRIVER1"
+        )
     endif()
 endfunction(tf_psa_crypto_set_base_compile_options)
 
@@ -398,6 +406,9 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
         add_custom_target(tf_psa_crypto_test_keys_header
             DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/tests/include/test/test_keys.h)
         add_dependencies(tf_psa_crypto_test tf_psa_crypto_test_keys_header)
+        if(TF_PSA_CRYPTO_TEST_DRIVER)
+            add_dependencies(tf_psa_crypto_test ${TF_PSA_CRYPTO_TEST_DRIVER_GENERATION_TARGETS})
+        endif()
     endif()
 
     file(WRITE
@@ -405,6 +416,12 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
         "This is a seedfile that contains 64 bytes ......................"
     )
 
+    # Note: "tests/include/test" exists solely to provide access to
+    #       "mbedtls/build_info.h". That header is an alias of
+    #       "tf-psa-crypto/build_info.h".
+    #
+    #       It is included in framework headers and C modules because those
+    #       components are also used in the Mbed TLS context.
     target_include_directories(tf_psa_crypto_test
         PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/tests/include
                 ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/tests/include

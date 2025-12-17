@@ -43,6 +43,9 @@ foreach (target IN LISTS target_libraries)
               ${PROJECT_SOURCE_DIR}/core
               ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS})
     tf_psa_crypto_set_config_files_compile_definitions(${target})
+    if(TF_PSA_CRYPTO_TEST_DRIVER)
+        add_dependencies(${target} ${TF_PSA_CRYPTO_TEST_DRIVER_GENERATION_TARGETS})
+    endif()
 endforeach(target)
 
 if(USE_SHARED_TF_PSA_CRYPTO_LIBRARY)
