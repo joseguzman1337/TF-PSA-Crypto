@@ -39,7 +39,10 @@ foreach (target IN LISTS target_libraries)
 
     target_include_directories(${target}
       PUBLIC include
-      PRIVATE ${PROJECT_SOURCE_DIR}/include
+      PRIVATE # Add the build-tree include directory before the source-tree one
+              # so that generated headers in the build tree take precedence.
+              ${PROJECT_BINARY_DIR}/include
+              ${PROJECT_SOURCE_DIR}/include
               ${PROJECT_SOURCE_DIR}/core
               ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS})
     tf_psa_crypto_set_config_files_compile_definitions(${target})

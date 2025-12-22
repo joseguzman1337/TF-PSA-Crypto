@@ -17,11 +17,14 @@ foreach (target IN LISTS target_libraries)
     tf_psa_crypto_set_base_compile_options(${target})
     target_include_directories(${target}
       PUBLIC include
-      PRIVATE ${TF_PSA_CRYPTO_DIR}/include
+      PRIVATE # Add the build-tree include directory before the source-tree one
+              # so that generated headers in the build tree take precedence.
+              ${PROJECT_BINARY_DIR}/include
+              ${PROJECT_SOURCE_DIR}/include
               ${TF_PSA_CRYPTO_DRIVERS_INCLUDE_DIRS}
               include/tf-psa-crypto/private/everest
               include/tf-psa-crypto/private/everest/kremlib
-              ${TF_PSA_CRYPTO_DIR}/core)
+              ${PROJECT_SOURCE_DIR}/core)
     tf_psa_crypto_set_config_files_compile_definitions(${target})
     if(TF_PSA_CRYPTO_TEST_DRIVER)
         add_dependencies(${target} ${TF_PSA_CRYPTO_TEST_DRIVER_GENERATION_TARGETS})

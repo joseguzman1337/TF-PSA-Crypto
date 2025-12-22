@@ -63,7 +63,6 @@ if(NOT DEFINED TF_PSA_CRYPTO_AS_SUBPROJECT)
 endif()
 
 # Set the project, Mbed TLS and framework root directory.
-set(TF_PSA_CRYPTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TF_PSA_CRYPTO_FRAMEWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/framework)
 
 # Put the version numbers into relevant files
@@ -72,7 +71,7 @@ set(version_number_files
         doxygen/tfpsacrypto.doxyfile)
 foreach(file ${version_number_files})
     configure_file(${file}.in
-                   ${TF_PSA_CRYPTO_DIR}/${file})
+                   ${PROJECT_SOURCE_DIR}/${file})
 endforeach(file)
 
 ADD_CUSTOM_TARGET(${TF_PSA_CRYPTO_TARGET_PREFIX}tfpsacrypto-apidoc
@@ -156,6 +155,13 @@ endif()
 # Make TF_PSA_CRYPTO_CONFIG_FILE and TF_PSA_CRYPTO_USER_CONFIG_FILE into PATHs
 set(TF_PSA_CRYPTO_CONFIG_FILE "" CACHE FILEPATH "TF-PSA-Crypto config file (overrides default).")
 set(TF_PSA_CRYPTO_USER_CONFIG_FILE "" CACHE FILEPATH "TF-PSA-Crypto user config file (appended to default).")
+set(TF_PSA_CRYPTO_CONFIG_NAME "" CACHE STRING "Name of the configuration to use (see config.py documentation)")
+
+if(NOT "${TF_PSA_CRYPTO_CONFIG_NAME}" STREQUAL "")
+    if(NOT "${TF_PSA_CRYPTO_CONFIG_FILE}" STREQUAL "")
+        message(FATAL_ERROR "TF_PSA_CRYPTO_CONFIG_NAME and TF_PSA_CRYPTO_CONFIG_FILE are incompatible.")
+    endif()
+endif(NOT "${TF_PSA_CRYPTO_CONFIG_NAME}" STREQUAL "")
 
 # Create a symbolic link from ${base_name} in the binary directory
 # to the corresponding path in the source directory.
@@ -427,6 +433,9 @@ if(ENABLE_TESTING OR ENABLE_PROGRAMS)
                 ${TF_PSA_CRYPTO_FRAMEWORK_DIR}/tests/include
                 tests/include
                 tests/include/test
+                # Add the build-tree include directory before the source-tree one
+                # so that generated headers in the build tree take precedence.
+                ${CMAKE_CURRENT_BINARY_DIR}/include
                 include
                 core
                 drivers/builtin/src)
